@@ -1,0 +1,487 @@
+title: 每日学习炸鸡
+date: 2015-08-28 22:18:44
+tags: Android
+----
+
+每天都会看些文章视频等学习资料，看的多了有时候当时记住了，但是过后也许就忘了，所以要记录一下，以巩固知识。
+
+<!--more-->
+
+- n个结点的哈夫曼树，叶子结点有 （n/2+1） 个
+
+- 排序算法总结
+
+| 排序法 | 平均 | 最差 | 辅助 | 是否稳定 |
+|:-----:|:----:|:---:|:----:|:------:|
+| 冒泡 | O(n\*n) | O(n\*n) | O(1) | 稳定 |
+| 快排 | O(n\*logn) | O(n\*n) | O(logn)-O(n) | 不稳定 |
+| 选择 | O(n\*n) | O(n\*n) | O(1) | 稳定 |
+| 插入 | O(n\*n) | O(n\*n) | O(1) | 稳定 |
+| 堆排 | O(n\*logn) | O(n\*logn) | O(1) | 不稳定 |
+| 希尔 |  |  | O(1) | 不稳定 |
+
+![sort](http://7xivx9.com1.z0.glb.clouddn.com/sort.png)
+
+- 关于广播
+ - 静态注册广播最大优先级为 2147483647
+ - 生命周期只有十秒左右，如果在 onReceive() 内做超过十秒内的事情，就会报ANR(Application No Response) 程序无响应的错误信息，如果需要完成一项比较耗时的工作 , 应该通过发送 Intent 给 Service, 由Service 来完成 . 这里不能使用子线程来解决 , 因为 BroadcastReceiver 的生命周期很短 , 子线程可能还没有结束BroadcastReceiver 就先结束了 .BroadcastReceiver 一旦结束 , 此时 BroadcastReceiver 的所在进程很容易在系统需要内存时被优先杀死 , 因为它属于空进程 ( 没有任何活动组件的进程 ). 如果它的宿主进程被杀死 , 那么正在工作的子线程也会被杀死 . 所以采用子线程来解决是不可靠的。
+
+- Service 运行在主线程中，不能执行耗时操作。要区分 后台 和 子线程 的概念：Android的后台就是指，它的运行是完全不依赖UI的。即使Activity被销毁，或者程序被关闭，只要进程还在，Service就可以继续运行。比如说一些应用程序，始终需要与服务器之间始终保持着心跳连接，就可以使用Service来实现。你可能又会问，前面不是刚刚验证过Service是运行在主线程里的么？在这里一直执行着心跳连接，难道就不会阻塞主线程的运行吗？当然会，但是我们可以在Service中再创建一个子线程，然后在这里去处理耗时逻辑就没问题了。既然在Service里也要创建一个子线程，那为什么不直接在Activity里创建呢？这是因为Activity很难对Thread进行控制，当Activity被销毁之后，就没有任何其它的办法可以再重新获取到之前创建的子线程的实例。而且在一个Activity中创建的子线程，另一个Activity无法对其进行操作。但是Service就不同了，所有的Activity都可以与Service进行关联，然后可以很方便地操作其中的方法，即使Activity被销毁了，之后只要重新与Service建立关联，就又能够获取到原有的Service中Binder的实例。因此，使用Service来处理后台任务，Activity就可以放心地finish，完全不需要担心无法对后台任务进行控制的情况。
+
+- 布局原则
+ - 尽量多使用RelativeLayout和LinearLayout, 不要使用绝对布局AbsoluteLayout，在布局层次一样的情况下， 建议使用LinearLayout代替RelativeLayout, 因为LinearLayout性能要稍高一点，但往往RelativeLayout可以简单实现LinearLayout嵌套才能实现的布局；
+ - 将可复用的组件抽取出来并通过include标签使用；
+ - 使用ViewStub标签来加载一些不常用的布局；
+ - 使用merge标签减少布局的嵌套层次。
+
+- Hander、Message、Looper 的关系
+ - Looper:
+    每个线程有且最多只能有一个Looper对象，它是一个ThreadLocal
+    Looper内部有一个消息队列，loop()方法调用后线程开始不断从队列中取出消息执行
+    Looper使一个线程变成Looper线程
+ - Handler:
+    handler扮演了往MQ上添加消息和处理消息的角色（只处理由自己发出的消息），即通知MQ它要执行一个任务(sendMessage)，并在loop到自己的时候执行该任务(handleMessage)，整个过程是异步的。handler创建时会关联一个looper，默认的构造方法将关联当前线程的looper，不过这也是可以set的。
+ - Message:
+    尽管Message有public的默认构造方法，但是你应该通过Message.obtain()来从消息池中获得空消息对象，以节省资源。
+    如果你的message只需要携带简单的int信息，请优先使用Message.arg1和Message.arg2来传递信息，这比用Bundle更省内存
+    擅用message.what来标识信息，以便用不同方式处理message。
+
+- AsyncTask
+	在3.0之前的AsyncTask可以同时有5个任务在执行(再缓存128个)，而3.0之后的AsyncTask同时只能有1个任务在执行。为什么升级之后可以同时执行的任务数反而变少了呢？这是因为更新后的AsyncTask已变得更加灵活，如果不想使用默认的线程池，还可以自由地进行配置。比如使用如下的代码来启动任务：这样就可以使用我们自定义的一个Executor来执行任务，而不是使用SerialExecutor。上述代码的效果允许在同一时刻有15个任务正在执行，并且最多能够存储200个任务。
+	```
+		Executor exec = new ThreadPoolExecutor(15, 200, 10,  
+    	TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());  
+		new DownloadTask().executeOnExecutor(exec);  
+	```
+
+- Async 的问题
+ - cancel方法实现不是很好.
+   如果你调用了AsyncTask的cancel(false)，doInBackground()仍然会执行到方法结束，只是不会去调用onPostExecute()方法。但是实际上这是让应用程序执行了没有意义的操作。那么是不是我们调用cancel(true)前面的问题就能解决呢？并非如此。如果mayInterruptIfRunning设置为true，会使任务尽早结束，但是如果的doInBackground()有不可打断的方法会失效，比如这个BitmapFactory.decodeStream() IO操作。但是你可以提前关闭IO流并捕获这样操作抛出的异常。但是这样会使得cancel()方法没有任何意义
+
+ - 内存泄露问题
+   还有一种常见的情况就是，在Activity中使用非静态匿名内部AsyncTask类，由于Java内部类的特点，AsyncTask内部类会持有外部类的隐式引用。由于AsyncTask的生命周期可能比Activity的长，当Activity进行销毁AsyncTask还在执行时，由于AsyncTask持有Activity的引用，导致Activity对象无法回收，进而产生内存泄露。
+
+ - 结果丢失
+   另一个问题就是在屏幕旋转等造成Activity重新创建时AsyncTask数据丢失的问题。当Activity销毁并创新创建后，还在运行的AsyncTask会持有一个Activity的非法引用即之前的Activity实例。导致onPostExecute()没有任何作用。
+
+ - 串行并行多版本不一致
+   1.6之前为串行，1.6到2.3为并行，3.0之后又改回为串行，但是可以通过executeOnExecutor(Executor)实现并行处理任务。
+
+- 子线程中更新UI的三种方法
+ - Handler
+ - runOnUiThread(Runnable r)
+ - View.post(Runnable r)
+
+- Jackson 是一个将java对象转换成JSON与JSON转化java类的类库。Gson 是解决这个问题的流行方案，然而我们发现Jackson更高效,因为它支持替代的方法处理JSON:流、内存树模型,和传统JSON-POJO数据绑定。不过，请记住， Jsonkson库比起GSON更大，所以根据你的情况选择，你可能选择GSON来避免APP 65k个方法限制。
+
+- 小心关于WebViews的问题. 如果你必须显示一个web视图， 比如说对于一个新闻文章，避免做客户端处理HTML的工作， 最好让后端工程师协助，让他返回一个 "纯" HTML。 [WebViews 也能导致内存泄露](http://stackoverflow.com/questions/3130654/memory-leak-in-webview) 当保持引他们的Activity，而不是被绑定到ApplicationContext中的时候。
+
+- Android 内存泄露总结
+
+- [Android 开发最佳实践](https://github.com/futurice/android-best-practices/blob/master/translations/Chinese/README.cn.md)
+
+- HttpURLConnection 和 AndroidHttpClient(HttpClient 的封装)如何选择及原因：
+在 Froyo(2.2) 之前，HttpURLConnection 有个重大 Bug，调用 close() 函数会影响连接池，导致连接复用失效，所以在 Froyo 之前使用 HttpURLConnection 需要关闭 keepAlive。
+另外在 Gingerbread(2.3) HttpURLConnection 默认开启了 gzip 压缩，提高了 HTTPS 的性能，Ice Cream Sandwich(4.0) HttpURLConnection 支持了请求结果缓存。
+再加上 HttpURLConnection 本身 API 相对简单，所以对 Android 来说，在 2.3 之后建议使用 HttpURLConnection，之前建议使用 AndroidHttpClient。
+
+- [不要使用 enum](https://www.youtube.com/watch?v=Hzs6OBcvNQE&list=PLWz5rJ2EKKc9CBxr3BVjPTPoDPLdPIFCE)
+
+- 启动页的splash如何实现
+对该Activity应用主题
+```
+<style name="customBackground" parent="@android:style/Theme.Holo.Light">
+    <item name="android:windowBackground">@drawable/start_app</item>
+    <item name="android:windowNoTitle">true</item>
+</style>
+```
+
+- Android的定时任务一般有两种方式实现，其一是Java API的`Timer`，另外是Android的`Alarm`。但Timer有一个明显的短板，并不太适用于那些需要长期在后台运行的定时任务。Android会在长时间不用的情况下为了省电使CPU进入睡眠状态，可能导致Timer中的定时任务无法执行。而Alarm机制不存在此种问题，它可以唤醒CPU。
+
+-Activity间通过Intent传递数据大小有没有限制？
+貌似是40K。
+
+- Android APK 50M大小限制
+
+- 启动一个程序，可以主界面点击图标进入，也可以从一个程序中跳转过去，二者有什么区别？
+
+因为启动程序（主界面也是一个app），发现了在这个程序中存在一个设置为<category android:name="android.intent.category.LAUNCHER" />的activity,
+
+所以这个launcher会把icon提出来，放在主界面上。当用户点击icon的时候，发出一个Intent：
+
+```
+Intent intent = mActivity.getPackageManager().getLaunchIntentForPackage(packageName);
+mActivity.startActivity(intent);   
+```
+
+跳过去可以跳到任意允许的页面，如一个程序可以下载，那么真正下载的页面可能不是首页（也有可能是首页），这时还是构造一个Intent，startActivity.
+
+这个intent中的action可能有多种view,download都有可能。系统会根据第三方程序向系统注册的功能，为你的Intent选择可以打开的程序或者页面。所以唯一的一点
+
+`不同的是从icon的点击启动的intent的action是相对单一的，从程序中跳转或者启动可能样式更多一些。本质是相同的。`
+
+
+- 程序之间的亲和性的理解。
+
+1、默认情况下一个应用的所有Activity都是具有相同的affinity，都是从application中继承，application的`affinity默认就是manifest的包名`。
+
+2、`affinity对Activity来说，就像是身份证一样，可以告诉所在的Task，自己属于其中的一员。`
+
+3、应用场合：
+
+a:根据affinity重新为Activity选择合适的宿主Task;
+
+b:与allowTaskReparenting属性配合;
+
+c:启动Activity使用Intent设置了FLAG_ACTIVITY_NEW_TASK标记。
+
+
+
+- 下面这段代码有内存泄露，能找出来吗？
+
+```
+package com.zhy._01;
+
+import java.util.Arrays;
+
+/*
+ * 使用数组模拟栈
+ */
+public class MyStack
+{
+  private static final int DEFAULT_INIT_SIZE = 10;
+
+  private Object[] eles = new Object[DEFAULT_INIT_SIZE];
+  /**
+   * 当前栈顶索引
+   */
+  private int currentIndex;
+
+  /**
+   * 弹栈
+   * 
+   * @return
+   */
+  public Object pop()
+  {
+    if (currentIndex == 0)
+      throw new ArrayIndexOutOfBoundsException("stack is empty");
+    return eles[--currentIndex];
+  }
+
+  /**
+   * 压栈
+   * 
+   * @param o
+   */
+  public void push(Object o)
+  {
+    ensureCapacity();
+    eles[currentIndex++] = o;
+  }
+
+  private void ensureCapacity()
+  {
+    if (eles.length == currentIndex)
+    {
+      eles = Arrays.copyOf(eles, currentIndex * 2 + 1);
+    }
+  }
+
+}
+```
+
+
+- 使用Fragment，一定要清楚这些方法，哪个会销毁视图，哪个会销毁实例，哪个仅仅只是隐藏，这样才能更好的使用它们。
+
+a、比如：我在FragmentA中的EditText填了一些数据，当切换到FragmentB时，如果希望会到A还能看到数据，则适合你的就是hide和show；也就是说，希望保留用户操作的面板，你可以使用hide和show，当然了不要使劲在那new实例，进行下非null判断。
+
+b、再比如：我不希望保留用户操作，你可以使用remove()，然后add()；或者使用replace()这个和remove,add是相同的效果。
+
+c、remove和detach有一点细微的区别，在不考虑回退栈的情况下，remove会销毁整个Fragment实例，而detach则只是销毁其视图结构，实例并不会被销毁。那么二者怎么取舍使用呢？如果你的当前Activity一直存在，那么在不希望保留用户操作的时候，你可以优先使用detach。
+
+
+- transaction.remove() 
+从Activity中移除一个Fragment，如果被移除的Fragment没有添加到回退栈，这个Fragment实例将会被销毁。
+
+- Handler总结：
+1、首先Looper.prepare()在本线程中保存一个Looper实例，然后该实例中保存一个MessageQueue对象；因为Looper.prepare()在一个线程中只能调用一次，所以MessageQueue在一个线程中只会存在一个。
+
+2、Looper.loop()会让当前线程进入一个无限循环，不端从MessageQueue的实例中读取消息，然后回调msg.target.dispatchMessage(msg)方法。
+
+3、`Handler的构造方法，会首先得到当前线程中保存的Looper实例，进而与Looper实例中的MessageQueue想关联`。
+
+4、Handler的sendMessage方法，会给msg的target赋值为handler自身，然后加入MessageQueue中。
+
+5、在构造Handler实例时，我们会重写handleMessage方法，也就是msg.target.dispatchMessage(msg)最终调用的方法。
+
+
+- 在3.0以前，最大支持128个线程的并发，10个任务的等待。在3.0以后，无论有多少任务，都会在其内部单线程执行；
+
+
+- EventBus.getDefault().register(this);意思是让EventBus扫描当前类，把所有onEvent开头的方法记录下来，如何记录呢？使用Map，Key为方法的参数类型，Value中包含我们的方法。然后当子线程执行完毕，调用EventBus.getDefault().post(new ItemListEvent(Item.ITEMS))时，EventBus会根据post中实参的类型，去Map中查找对于的方法，于是找到了我们的onEventMainThread，最终调用反射去执行我们的方法。
+
+
+- 关于Activity和Application的Context
+![image](http://img.blog.csdn.net/20150104183450879)
+有一些NO上添加了一些数字，其实这些从能力上来说是YES，但是为什么说是NO呢？下面一个一个解释：
+
+数字1：启动Activity在这些类中是可以的，但是需要创建一个新的task。一般情况不推荐。
+
+数字2：在这些类中去layout inflate是合法的，但是会使用系统默认的主题样式，如果你自定义了某些样式可能不会被使用。
+
+数字3：在receiver为null时允许，在4.2或以上的版本中，用于获取黏性广播的当前值。（可以无视）
+
+注：ContentProvider、BroadcastReceiver之所以在上述表格中，是因为在其内部方法中都有一个context用于使用。
+
+看下表格，重点看Activity和Application，可以看到，和UI相关的方法基本都不建议或者不可使用Application，并且，前三个操作基本不可能在Application中出现。实际上，只要把握住一点，凡是跟UI相关的，都应该使用Activity做为Context来处理；其他的一些操作，Service,Activity,Application等实例都可以，当然了，注意Context引用的持有，防止内存泄漏。
+
+
+- MVP
+![image](http://img.blog.csdn.net/20150622212835554)
+转换为
+![image](http://img.blog.csdn.net/20150622212856011)
+
+![image](http://img.blog.csdn.net/20150622212916054)
+
+其实最明显的区别就是，MVC中是允许Model和View进行交互的，而MVP中很明显，Model与View之间的交互由Presenter完成。还有一点就是Presenter与View之间的交互是通过接口的。[参考文章](http://blog.csdn.net/lmj623565791/article/details/46596109)
+
+
+- Reflection
+获取类中方法：
+```
+// 获取 Class 对象中指定函数名和参数的函数，参数一为函数名，参数 2 为参数类型列表
+public Method getDeclaredMethod (String name, Class...<\?> parameterTypes)
+
+// 获取该 Class 对象中的所有函数( 不包含从父类继承的函数 )
+public Method[] getDeclaredMethods ()
+
+// 获取指定的 Class 对象中的**公有**函数，参数一为函数名，参数 2 为参数类型列表
+public Method getMethod (String name, Class...<\?> parameterTypes)
+
+// 获取该 Class 对象中的所有**公有**函数 ( 包含从父类和接口类集成下来的函数 )
+public Method[] getMethods ()
+```
+
+这里需要注意的是 getDeclaredMethod 和 getDeclaredMethods 包含 private、protected、default、public 的函数，并且通过这两个函数获取到的只是在自身中定义的函数，从父类中集成的函数不能够获取到。而 getMethod 和 getMethods 只包含 public 函数，父类中的公有函数也能够获取到。
+
+获取类中属性：
+```
+// 获取 Class 对象中指定属性名的属性，参数一为属性名
+public Method getDeclaredField (String name)
+
+// 获取该 Class 对象中的所有属性( 不包含从父类继承的属性 )
+public Method[] getDeclaredFields ()
+
+// 获取指定的 Class 对象中的**公有**属性，参数一为属性名
+public Method getField (String name)
+
+// 获取该 Class 对象中的所有**公有**属性 ( 包含从父类和接口类集成下来的公有属性 )
+public Method[] getFields ()
+```
+
+这里需要注意的是 getDeclaredField 和 getDeclaredFields 包含 private、protected、default、public 的属性，并且通过这两个函数获取到的只是在自身中定义的属性，从父类中集成的属性不能够获取到。而 getField 和 getFields 只包含 public 属性，父类中的公有属性也能够获取到。
+
+获取父类
+```
+Student student = new Student("mr.simple");
+    Class<\?> superClass = student.getClass().getSuperclass();
+    while (superClass != null) {
+        System.out.println("Student's super class is : " + superClass.getName());
+        // 再获取父类的上一层父类，直到最后的 Object 类，Object 的父类为 null
+        superClass = superClass.getSuperclass();
+}
+```
+
+获取接口
+```
+private static void showInterfaces() {
+        Student student = new Student("mr.simple");
+        Class<\?>[] interfaceses = student.getClass().getInterfaces();
+        for (Class<\?> class1 : interfaceses) {
+            System.out.println("Student's interface is : " + class1.getName());
+        }
+}
+```
+
+
+- [依赖注入](http://a.codekk.com/detail/Android/%E6%89%94%E7%89%A9%E7%BA%BF/%E5%85%AC%E5%85%B1%E6%8A%80%E6%9C%AF%E7%82%B9%E4%B9%8B%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5)
+
+- [Java Collections 系类学习](http://zhangshixi.iteye.com/blog/672697)
+
+- [ArrayList 和 LinkedList 各种遍历方式比较](http://www.trinea.cn/android/arraylist-linkedlist-loop-performance/)
+
+- Dalvik根据屏幕尺寸和密度决定应用程序的heap size，例如Android4.0.3的应用默认最小内存如下：
+![image](http://farm4.staticflickr.com/3686/9449083513_a56b59b17d_o.jpg)
+
+- ScrollView 只允许包含一个子 View
+
+- [TextView 添加链接](http://www.trinea.cn/android/textview-add-link/)
+
+- [Android应用如何开机自启动、自启动失败原因](http://www.trinea.cn/android/android-boot_completed-not-work/)
+
+- [关于Android线程优先级](http://droidyue.com/blog/2015/09/05/android-process-and-thread-schedule-nice/)
+
+- 有时候写的 BroadcastReceiver 中让线程 Thread.sleep(60*1000) 也不会出现 ANR，是因为确实发生了 ANR，只是没有弹窗而已，这种是 Background ANR，可以通过过滤日志验证，或者在开发者选项中勾选 "显示应用程序无响应" 对话框即可。
+
+- 在Java中，非静态的内部类和匿名内部类都会隐式地持有其外部类的引用。静态的内部类不会持有外部类的引用
+
+- [Handler引起的内存泄露](http://droidyue.com/blog/2014/12/28/in-android-handler-classes-should-be-static-or-leaks-might-occur/?droid_refer=random_recommend)
+
+- [依赖注入](http://droidyue.com/blog/2015/06/13/talk-show-about-dependency-injection/?droid_refer=ninki_posts) 开始看这个名字的时候我还以为是安全性问题，读过文章之后才知道这是设计模式中依赖倒置的问题。先看段代码，看看有什么问题：
+
+```java
+interface Energy {     
+}
+  
+class GasEnergy implements Energy {
+}
+  
+class Car {
+  Energy energy = new GasEnergy();
+}
+```
+
+采用组合依赖的形式本就是设计模式所推荐的，这无可厚非，可问题出现在直接 new 具体对象了，导致了耦合度增加，假如以后要修改具体对象类型了，此时还得修改 Car 类，这绝对不符合开闭原则，所以也就有了依赖注入，代码不写了，给三种方法：`构造器注入`,`Setters 方法注入`,`接口注入(接口里有 set 方法)`
+
+注入框架：
+（1）Guice采用的是运行时读取注解，通过反射的形式生成依赖并进行注入。这种形式不太适合Android移动设备，毕竟这些操作都在运行时处理，对性能要求较高。
+（2）Dagger则是Android开发适合的依赖注入库，其同样采用类注解的形式，不同的是它是在编译时生成辅助类，等到在运行时使用生成的辅助类完成依赖注入。
+
+- 我知道 Reader、Writer 字符流比 InputStream、OutputStream 多了一个缓存（缓冲）的特点，原来就是有些情况不调用 flush、close 的话不会将数据真正发送出去，才明白
+
+- [Android 系统设置中的清除数据究竟会清除哪些数据](http://droidyue.com/blog/2014/06/15/what-will-be-removed-if-you-click-clear-data-button-in-system-application-item/)
+
+- [申请权限支持设备不减少](http://droidyue.com/blog/2014/07/04/attentions-when-adding-permission-for-android-application/)
+
+- [Webview加载网页时发送HTTP头信息](http://droidyue.com/blog/2014/07/12/load-url-with-extra-header-in-android-webview-chinese-edition/)
+
+- [顶部带进度条的Webview](http://droidyue.com/blog/2014/07/12/ding-bu-dai-jin-du-tiao-de-webview/)
+
+- [捕获Android文本中链接点击事件](http://droidyue.com/blog/2014/07/27/capture-link-click-event-in-text-on-android/)
+
+- [超简单生成微博微信应用签名](http://droidyue.com/blog/2014/08/13/create-fignerprint-for-weibo-or-wechat-in-the-easiest-way/)
+
+- [终于可以使用Markdown写邮件啦](http://droidyue.com/blog/archives/)
+
+- [有关 Java 字符串的拼接](http://droidyue.com/blog/2014/08/30/java-details-string-concatenation/)
+
+- [Android根据资源名获取资源ID](http://droidyue.com/blog/2014/09/12/get-resource-id-by-name-in-android/)
+
+- [Android中Java和JavaScript交互](http://droidyue.com/blog/2014/09/20/interaction-between-java-and-javascript-in-android/)
+
+- [细话Java："失效"的private修饰符](http://droidyue.com/blog/2014/10/02/the-private-modifier-in-java/)
+
+- [Java 四种引用类型](http://droidyue.com/blog/2014/10/12/understanding-weakreference-in-java/)
+
+- [糟糕的 AsyncTask](http://droidyue.com/blog/2014/11/08/bad-smell-of-asynctask-in-android/)
+
+- [如何使用 Loaders](http://developer.android.com/intl/zh-cn/guide/components/loaders.html)
+
+- [Android 垃圾回收日志](http://droidyue.com/blog/2014/11/08/understanding-garbage-collection-output-messages-in-android/)
+
+- [自定义 Toast 自己实现下](http://droidyue.com/blog/2014/11/29/custom-toast-like-tencent-news-app/)
+
+- [Java 中堆和栈的区别 非常好的总结](http://droidyue.com/blog/2014/12/07/differences-between-stack-and-heap-in-java/)
+
+- [关于 subString() 引起的"内存泄露"](http://droidyue.com/blog/2014/12/14/substring-memory-issue-in-java/) 
+
+- [JVM运行时的数据区](http://droidyue.com/blog/2014/12/21/java-runtime-data-areas/)
+
+- 字符串常量池中存储的是字符串引用，而不是字符串本身，因为在 Java 中，对象都创建在堆内存中，[参考文章](http://droidyue.com/blog/2014/12/21/string-literal-pool-in-java/)
+
+- 对于使用new创建的字符串，如果也想将其引用放到字符串常量池中，可以使用intern方法
+```
+String str4 = str3.intern();
+System.out.println(str4 == str1);
+```
+
+- [Java 中的动态绑定和静态绑定](http://droidyue.com/blog/2014/12/28/static-biding-and-dynamic-binding-in-java/)。可以简单理解就是，重载是静态绑定，覆写是动态绑定。[又一动态绑定](http://www.cnblogs.com/dolphin0520/p/3803432.html)
+
+- [单例模式双重加锁时也要记得给instace加上volatile](http://droidyue.com/blog/2015/01/11/looking-into-singleton/)。另外 IoDH 技术可以用静态内部类实现在类加载时对instance进行初始化，类似于 Holder。
+
+- [单例模式可以被打破](http://droidyue.com/blog/2015/01/11/looking-into-singleton/)
+
+- [AutoBoxing UnBoxing == 与 Integer缓存-128~127的坑](http://droidyue.com/blog/2015/04/07/autoboxing-and-autounboxing-in-java/)
+
+- [Context 泄露](http://droidyue.com/blog/2015/04/12/avoid-memory-leaks-on-context-in-android/)。其中也说到了Drawable引起的内存泄露。
+
+- [关于 HttpUrlConnection 和 HttpClient 的区别](http://droidyue.com/blog/2015/05/30/android-http-clients/)
+
+- [关于 lint](http://droidyue.com/blog/2015/07/25/use-android-lint-to-find-higher-api-usage/)
+
+- android:sharedUserId是指共用一个uid
+
+- 大多数static的数据被mmapped到一个进程中。这不仅仅让同样的数据能够在进程间进行共享，而且使得它能够在需要的时候被paged out。常见的static数据包括Dalvik Code、app resources、so文件等。
+
+- Bitmap decode format 解码格式的差异？
+
+- 利用inBitmap的高级特性提高Android系统在Bitmap分配与释放执行效率
+
+- [内存泄露](http://www.csdn.net/article/2015-09-18/2825737/4)
+
+- 谨慎使用static对象。因为static的生命周期过长，和应用的进程保持一致，使用不当很可能导致对象泄漏，在Android中应该谨慎使用static对象
+![image](http://img.ptcms.csdn.net/article/201509/18/55fbe22546ba6.jpg)
+
+- [LeakCanary](http://www.liaohuqiu.net/cn/posts/leak-canary-read-me/)
+
+- [MAT的使用](http://androidperformance.com/2015/04/11/AndroidMemory-Usage-Of-MAT/)
+
+- [Android Performance 中文](http://androidperformance.com/)
+
+- [JobScheduler](http://developer.android.com/intl/zh-cn/reference/android/app/job/JobScheduler.html)
+
+- 如果在onDraw里面执行内存分配的操作，会容易导致内存抖动，GC频繁被触发，虽然GC后来被改进为执行在另外一个后台线程(GC操作在2.3以前是同步的，之后是并发)，可是频繁的GC的操作还是会影响到CPU，影响到电量的消耗。
+![image](http://hukai.me/images/android_perf_2_ondraw_paint.png)
+
+- [Strict Mode 防止出现ANR 第11部分](http://hukai.me/android-performance-patterns-season-2/) 
+
+- 尽量使用ClipRect等方法来提高绘制的性能 ?
+
+- 执行延时任务的三种方式：AlarmManager、SyncAdapter、JobSchedulor
+
+- Android 图片解码格式
+![image](http://hukai.me/images/android_perf_2_pixel_format.png)
+
+- Android 图片解码率
+![image](http://hukai.me/images/android_perf_2_pixel_decode.png)
+
+- 一种新的图片格式：Webp，它是由Google推出的一种既保留png格式的优点，又能够减少图片大小的一种新型图片格式
+
+- 缩放Bitmap的几种方式比较
+createScaledBitmap(),这种方法能够快速得到一张经过缩放的图片，可是这个方法能够执行的前提是，原图片需要事先加载到内存中，如果原图片过大，很可能导致OOM；
+inSampleSize能够等比的缩放显示图片，同时还避免了需要先把原图加载进内存的缺点；
+![image](http://hukai.me/images/android_perf_2_sacle_bitmap_code.png)
+还可以使用inScaled，inDensity，inTargetDensity的属性来对图片解码做处理；
+![image](http://hukai.me/images/android_perf_2_sacle_bitmap_inscale.png)
+使用inJustDecodeBounds，可以事先获取到图片的大小而不至于占用内存。
+![image](http://hukai.me/images/android_perf_2_sacle_bitmap_injust.png)
+
+- inBitmap
+
+- Glide 库
+
+- 对象池？
+
+- [继承中的隐藏和覆盖](http://www.cnblogs.com/dolphin0520/p/3803432.html)
+
+- 单线程私有：程序计数器、JVM栈、本地方法栈
+  多线程共享：堆内存、方法区、运行时常量池
+
+- 子 View 可以通过调用 getParent().requestDisallowInterceptTouchEvent(true);  阻止 ViewGroup 对其 MOVE 或者 UP 事件进行拦截。
+
+- 产生 ANR 的前提是要有输入事件，如果用户没有触发任何输入事件，即便是主线程阻塞了，也不会产生 ANR，因为 InputDispatcher 没有分发事件给应用程序，当然也不会检测处理超时和报告ANR了。
+
+- 不会参与对象序列化的是：类的静态成员变量和 transient 关键字标记的。
+
+- 类 ServiceConnection 中的 onServiceDisconnected() 方法在正常情况下是不被调用的，它的调用时机是当 Service 服务被异外销毁时，例如内存的资源不足时这个方法才被自动调用。
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

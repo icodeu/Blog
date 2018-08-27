@@ -1,0 +1,20 @@
+title: 《第一行代码》 - 知识导图
+date: 2015-09-14 22:18:44
+tags: Android
+---
+
+强制自己使用思维导图，收益匪浅。最近复习 Android 相关知识，涉及 `Java 基础知识`, `《第一行代码》`, `Android 进阶`, `数据结构`, `设计模式`。
+
+<!--more-->
+
+# 《第一行代码》
+
+![第一行代码](http://7xivx9.com1.z0.glb.clouddn.com/summary第一行代码.png)
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

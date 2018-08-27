@@ -1,0 +1,37 @@
+---
+layout: post
+title: "【视频教程】Base64 编码的编程使用"
+date: 2015-04-16 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+Base64 算法最早应用于解决电子邮件传输的问题，在早期，由于“历史问题”，电子邮件只允许 ASCII 码字符，如果要传送一封带有非 ASCII 码字符的电子邮件，当它通过一些网关的时候就可能出现问题。这个网关很可能会对这个非 ASCII 码字符的二进制位做调整，即将这个非 ASCII 码的 8 位二进制码的最高位置为 0，此用户收到的邮件就会是一封纯粹的乱码邮件，基于这个原因产生了 Base64 算法。
+
+**核心内容**
+
+* 综述密码学
+* 概述密码学中关键概念（尤其区分密钥和口令）
+* 简介 Base64 的概念、应用
+* Base64 的编程使用
+* 利用 telnet 客户端演示 Base64 在登录邮件系统中的作用
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/738.html?hmsr=teacher_icodeyou_c738)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_Base64编码的编程使用.mp4" controls="controls"></video>
+</div>
+
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

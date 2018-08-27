@@ -1,0 +1,25 @@
+title: 自己真正读过的好书
+date: 2015-10-08 22:18:44
+tags: Android
+----
+
+网上总是能看到各种推荐的所谓 "程序员必读" 书籍，但这些书籍可能连推荐人本身都没有读过或读完——只是推荐的人多了，自然就成了"好书"而已。下面所列的每一本书，我自己肯定都是从头到尾读完了的，并且觉得大有裨益。
+
+<!--more-->
+
+先写两个近期看的，以后有时间再慢慢更新。
+
+[《Android 群英传》](http://item.jd.com/11758334.html)
+
+[《Android 开发艺术探索》](http://item.jd.com/11760209.html)
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

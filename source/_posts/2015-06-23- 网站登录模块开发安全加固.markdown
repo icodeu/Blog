@@ -1,0 +1,35 @@
+---
+layout: post
+title: "【视频教程】网站登录模块开发安全加固"
+date: 2015-06-23 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+现今很多网站为了完成功能而使用明文传输或存储数据，这一不安全的做法使得敏感数据容易被窃听，从而造成隐私泄露。一次又一次的用户信息泄露事件警示我们应注重信息传输和存储的安全性，从而加固 Web 应用开发的安全性。
+
+**核心内容**
+
+1.使用 JSP+MySQL 编写登录模块
+2.在 MySQL 中使用 MD5 和 SHA1 对数据加密
+3.在 MySQL 中对数据进行加盐处理
+4.在浏览器端对数据进行摘要处理
+5.使用 WireShark 抓取分析数据包 
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/1424.html?hmsr=teacher_icodeyou_c1424)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_网站登录模块开发安全加固.mp4" controls="controls"></video>
+</div>
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

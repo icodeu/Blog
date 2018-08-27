@@ -1,0 +1,33 @@
+---
+layout: post
+title: "【视频教程】安全协议和认证服务"
+date: 2015-06-17 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+网站通信时既需要数字证书，也需要安全协议的支持。常用的 HTTPS 协议实际上是基于 SSL/TLS 的 HTTP 协议，即该位于传输层的 SSL/TLS 协议自身带有加密信息，提供给上层的应用层使用，以达到数据安全通信的目的。 
+
+**核心内容**
+
+1.安全协议的概念
+2.TLS 协议内容和通信模型
+3.基于 Tomcat 构建单双向认证服务  
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/1383.html?hmsr=teacher_icodeyou_c1383)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_安全协议和认证服务.mp4" controls="controls"></video>
+</div>
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

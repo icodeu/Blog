@@ -1,0 +1,35 @@
+---
+layout: post
+title: "【视频教程】消息摘要的编程使用"
+date: 2015-04-28 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+当在互联网上传输文件时，偶尔也会有遇到传输文件损坏的情况，严重时，还可能从某软件的官网上下载到被篡改的文件。如何来验证下载到的文件和官方提供的源文件是否一致，此时需要使用消息摘要进行对比。
+
+**核心内容**
+
+* 消息摘要的概念、种类和作用
+* MD 类消息摘要的编程使用
+* SHA 类消息摘要的编程使用
+* HMAC 消息摘要的编程使用
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/804.html?hmsr=teacher_icodeyou_c804)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_消息摘要的编程使用.mp4" controls="controls"></video>
+</div>
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

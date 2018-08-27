@@ -1,0 +1,33 @@
+---
+layout: post
+title: "【视频教程】数字签名的编程使用"
+date: 2015-06-02 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+数字签名算法是公钥基础设施（PKI）以及许多网络安全机制（SSL/TLS、VPN等）的基础，能够验证数据完整性、认证数据来源、并起到抗否认的作用。同时，数字签名算法可以看做是一种带有密钥的消息摘要算法，并且这种密钥包含了公钥和私钥，也就是说，数字签名算法是非对称加密算法和消息摘要算法的结合体。
+
+**核心内容**
+
+* 数字签名概述
+* RSASignature 算法的编程使用
+* DSASignature 算法的编程使用 
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/1239.html?hmsr=teacher_icodeyou_c1239)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_数字签名的编程使用.mp4" controls="controls"></video>
+</div>
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

@@ -1,0 +1,131 @@
+title: 排序查找算法总结
+date: 2015-04-18 22:18:44
+tags: 数据结构与算法
+---
+
+总结下常见的各种排序算法，包括改进的冒泡排序、直接插入、快排、堆排等。
+
+<!--more-->
+
+# 普通冒泡排序
+
+```
+void BubbleSort(int data[], int n) {
+	int i, j;
+	for ( i=0; i<\n-1; i++ )
+		for ( j=n-1; j>i; j-- )
+			swap(data, i, j);
+}
+```
+
+优化后的冒泡排序
+```
+void BubbleSort(int data[], int n) {
+	int i, j;
+	bool flag = true;
+	for ( i=0; i<\n-1 && flag; i++) {
+		flag = false;
+		for ( j=n-1; j>i; j--)
+			if (needSwap) {
+				swap(data, i, j);
+				flag = true;
+			}
+	}
+}
+```
+
+# 快排
+```
+void QSort(int data[], int low, int high) {
+	int pivot;
+	if (low < high) {
+		pivot = Partition(data, low, high);
+		QSort(data, low, pivot-1);
+		QSort(data, pivot+1, high);
+	}
+}
+
+int Partition(int data[], int low, int high) {
+	int pivotKey = data[low];
+	while (low < high) {
+		while (low < high && data[high] >= pivotKey)
+			high--;
+		swap(data, low, high);
+
+		while (low <high && data[low] <= pivotKey)
+			low++;
+		swap(data, low, high);
+	}
+	return low;
+}
+```
+
+# 二分查找
+
+```
+int BinarySearch(int data[], int n, int key) {
+	int low = 0, high = n-1, mid;
+	
+	while ( low <= high ) {
+		mid = (low + high) >>> 1;
+		if ( data[mid] > key ) 
+			high = mid - 1;
+		else if ( data[mid] < key )
+			low = mid + 1;
+		else if ( data[mid] == key )
+			return mid;
+	}
+
+	return -1;
+}
+```
+
+# 二叉排序树查找
+
+```
+typedef struct BiTNode {
+	int data;
+	struct BiTNode *left, *right;
+}BiTNode, *BiTree;
+
+BiTree search(BiTree root, int key) {
+	if (root == NULL) 
+		return NULL;
+	if (key < root->data)
+		return search(root->left, key);
+	if (key > root->data)
+		return search(root->right, key);
+	return root;
+}
+```
+
+# 散列表
+```
+void InsertHash(int data[], int key, int n) {
+	int addr = indexFor(key);
+	while (data[addr] != NULL_KEY)
+		addr = (addr + 1) % n;
+	data[addr] = key;
+}
+
+int SearchHash(int data[], int key, int n) {
+	addr = indexFor(key);
+	while (data[addr] != key) {
+		addr = (addr + 1) % n;
+		if (data[addr] == NULL_KEY || addr = indexFor(key))
+			return -1;
+	}
+	return addr;
+}
+```
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

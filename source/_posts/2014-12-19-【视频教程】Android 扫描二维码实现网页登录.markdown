@@ -1,0 +1,36 @@
+---
+layout: post
+title: "【视频教程】Android 扫描二维码实现网页登录"
+date: 2014-12-19 15:20:33 +0800
+comments: true
+tags: [极客学院, Android]
+---
+
+**课程背景**
+
+起初微信网页版有客户端扫描二维码登录的功能，之后越来越多的站点开始利用这一新兴形式，开发出了使用二维码登录网站的各种应用。这种方式既不需要用户在网页端输入个人信息，又能保证安全性，可以切实提高用户体验度。
+
+**核心内容**
+
+* 下载使用 ZXing 库
+* 利用 API 实现 PHP 生成二维码
+* 使用 PHP 制定 API 接口，利用 Android的HttpUrlConnection 对其进行访问
+* 扫描二维码登录网页流程
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/420.html)**学习~
+
+<div class="video-container">
+	<video src="http://icodeyou.qiniudn.com/Android 扫描二维码实现网页登录.mp4" controls="controls"></video>
+</div>
+
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

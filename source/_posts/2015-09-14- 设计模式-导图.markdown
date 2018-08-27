@@ -1,0 +1,20 @@
+title: 设计模式 - 知识导图
+date: 2015-09-14 22:18:44
+tags: 设计模式
+---
+
+设计模式知识导图
+
+<!--more-->
+
+# 设计模式
+
+![设计模式](http://7xivx9.com1.z0.glb.clouddn.com/summary设计模式.png)
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

@@ -1,0 +1,64 @@
+---
+layout: post
+title: "Android 窃取手机中微信聊天记录"
+date: 2015-06-05 15:25:33 +0800
+comments: true
+tags: Android
+---
+
+关于如何在 Android 手机上窃取微信聊天记录。
+
+<!--more-->
+
+这几天事情比较多，可还是想尽快写下这篇文章。
+
+本以为微信的聊天记录以我本人现存能力获取不到，但经过一番尝试，还是成功了。前提：手机需要已经 `root`。
+
+在我的直觉里，微信的聊天记录一定会是加密的，而且是用了现代密码学中的加密算法，只要官方保存好密钥那么我等平民不可能获取得到。而接下来，我想说的是我等平民如何能够获取到微信的所有聊天记录。
+
+一般来说，Android 应用程序的数据库文件会保存在 `/data/data/packagename/database` 文件夹下，而微信稍稍有些不同，但也不难发现其数据库文件保存位置，位于：`/data/data/com.tencent.mm/MicroMsg` 路径下，注意这里有两个像是乱码的很长名字的文件夹，这两个文件夹正是用户的个人信息保存的位置（我这里有两个，估计是之前谁用我的手机登录过微信。。。），再看这个文件夹里面有一个很显眼的数据库文件 **`EnMicroMsg.db`** ，凭猜测也可以感觉到前缀 En 应该是 Encrypt 的缩写，果然，用 SQLite Professional 打开提示该数据库文件被加密，具体如下几幅图
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx1.png)
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx2.png)
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx3.png)
+
+说实话，给 SQLite 加密，我还是第一次遇到。于是放狗搜，发现有一个软件叫做 sqlcipher.exe，在有密钥的情况下可以打开被加密的 db 文件（这个软件国内很难找，我放在了我的七牛云存储上，[点此下载](http://7xivx9.com1.z0.glb.clouddn.com/wxsqlcipher.exe)）。那么问题来了，密钥是什么？
+
+不懂微信为何要这样做，密钥是当前手机的 `IMEI + 微信UIN 的 MD5值（32位小写）前7位`。（注：此处信息不是自己发现的，是无意中在网上搜到的）分别说如何获得如上内容：
+
+- 获取 IMEI 码 : 
+	手机拨号输入 `*#06#`  显示出来的即是所需 IMEI
+- 获取微信 UIN 码 : 
+	相信大家都用过微信的网页版，我们就通过它来获取。首先登录微信版网页，再新建一个标签页 `chrome://net-internals/#events`，这个是 chrome 内置的抓包工具，所有进出的数据包都能看到，所以类似于下面这样
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx4.png)
+	
+之后在网页聊天界面随意给某个联系人发送一条消息，回到抓包标签页，按 Ctrl + F 全局搜索 `uin` ，这个时候就会看到下图中的 uin 码，我这里是 9 位
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx5.png)
+	
+到此为止，我们获取了设备的 IMEI(如12345) 和 微信账号的 UIN(如67890) 码，下面来计算 `32 位 MD5 消息摘要值`，使用 [MD5](http://md5jiami.51240.com/) 在线加密的网站就可以，则要加密的字符串为 `IMEI+UIN`，即 `1234567890`，加密后就会得到四种 MD5 值，我们需要的是32位长度小写的，如图
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx6.png)
+
+取该 `MD5 值前 7 位`，即为密钥。接下来，打开 sqlcipher.exe ，File->Open Database， 选择 EnMicroMsg.db 文件，打开后就可以看到让我们输入密钥，输入刚才的7位密钥，点击OK，如图
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx7.png)
+
+如果你成功看到了下图的界面，则说明99%已经成功了。
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx8.png)
+
+那如何能看到真正的聊天记录内容呢，点击 Browse Data，再筛选 message ，看吧，赤裸裸的聊天记录赫然摆在眼前。。。
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxwx10.png)
+
+**最后，想跟各位说的是，手机千万不要交给程序员。。。**
+
+###个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

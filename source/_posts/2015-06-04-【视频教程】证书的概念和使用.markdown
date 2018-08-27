@@ -1,0 +1,33 @@
+---
+layout: post
+title: "【视频教程】证书的概念和使用"
+date: 2015-06-04 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+无论是公钥密码还是数字签名，其中公钥都扮演了重要的角色。然而，如果不能判断自己手上的公钥是否合法，就有可能遭到中间人攻击。为了应对此种情况，就需要使用证书技术对公钥的合法性提供证明。
+
+**核心内容**
+
+* 证书的概念和应用场景
+* 公钥基础设施的概念和作用
+* 使用 VeriSign 服务生成证书
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/1271.html?hmsr=teacher_icodeyou_c1271)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_证书的概念和使用.mp4" controls="controls"></video>
+</div>
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

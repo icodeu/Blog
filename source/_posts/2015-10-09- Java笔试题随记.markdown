@@ -1,0 +1,116 @@
+title: Java 笔试题随记
+date: 2015-10-09 22:18:44
+tags: Java
+----
+
+在牛客网上刷题，记录一些错题。
+
+<!--more-->
+
+- 没有 <<<= 运算符
+
+- 执行顺序：静态代码块 > 构造代码块 > 构造函数
+
+- 静态变量和静态代码块的执行顺序就是代码前后的顺序
+
+- 执行顺序
+   父类静态块
+   自身静态块
+   父类块
+   父类构造器
+   自身块
+   自身构造器 
+
+- 程序的赋值步骤为
+	父类的静态变量赋值
+	自身的静态变量赋值
+	父类成员变量赋值
+	父类块赋值
+	父类构造器赋值
+	自身成员变量赋值
+	自身块赋值
+	自身构造器赋值
+
+- 子类构造函数若没有显示调用 super() 构造函数的话，会被默认插入
+
+- ResultSet中记录行的第一列索引为 1
+
+- 枚举类 所有的枚举值都是类静态常量，在初始化时会对所有的枚举值对象进行第一次初始化
+
+- 线程安全的类：Vector、HashTable、StringBuffer、Properties
+
+- final 只是指向不变，但是指向的值有可能变，所以依然不是线程安全
+
+- 对 volatile 变量的操作不是原子性的
+
+- 只有同一个类加载器加载的相同类名的才是一个class
+
+- Integer 作为参数传递的时候会拆箱，变成值传递
+
+- Java数据库连接库JDBC用到 桥接模式，JDBC提供两套接口，一个面向数据库厂商，一个面向JDBC使用者。
+
+- Xmx：最大堆大小   Xms：初始堆大小   Xmn:年轻代大小   XXSurvivorRatio：年轻代中Eden区与Survivor区的大小比值
+
+- 继承具有传递性
+
+- (TestClass)null == TestClass
+
+- 类B从类A派生，则类B可以访问类A中的 public、protected 成员
+
+- 局部变量必须显示初始化
+
+- Java实现了真数组，避免了覆盖数据的可能
+
+- 方法区在JVM中也是一个非常重要的区域，它与堆一样，是被 线程共享 的区域。 在方法区中，存储了每个类的信息（包括类的名称、方法信息、字段信息）、静态变量、常量以及编译器编译后的代码等。
+
+- 硬链接就是同一个文件使用了多个别名。若文件用户数据块中存放的内容是另一文件的路径名的指向，则该文件就是软链接
+
+- Stack继承了Vector,所以也是线程安全的
+
+- HashMap 把 Hashtable 的 contains 方法去掉了，因为 contains 方法容易让人产生误解
+
+- 持久带中主要存放用于存放静态类型数据，如 Java Class, Method 等， 与垃圾收集器要收集的Java对象关系不大。而heapspace分为年轻带和年老带。年轻代的垃圾回收叫 Young GC， 年老代的垃圾回收叫 Full GC。
+
+- 持久堆内存，即为存放字节码文件对象的地方，因为平时每个.class文件的对象都只有一份，此对象的唯一性由全限定类名和类加载器共同决定，正常编程时不会溢出，只有修改类加载器，生成大量的字节码文件对象，才会溢出。
+
+- JVM堆内存分为2块：Permanent Space 和 Heap Space。
+Permanent 即 持久代（Permanent Generation），主要存放的是Java类定义信息，与垃圾收集器要收集的Java对象关系不大。
+Heap = { Old + NEW = {Eden, from, to} }，Old 即 年老代（Old Generation），New 即 年轻代（Young Generation）。年老代和年轻代的划分对垃圾收集影响比较大。
+
+- Java 运行时内存划分与线程可见性
+线程共享：方法区，堆区
+线程私有：虚拟机栈，本地方法栈，程序计数器
+
+- [Java 堆内存设置原理](http://blog.csdn.net/sivyer123/article/details/17139443)
+
+- java语言中的方法属于对象的成员,而不是类的成员
+
+- 子类重写方法时，不能降低从基类继承的方法的可见性
+
+- final类型的变量一定要初始化，因为final的变量不可更改
+
+- %和*是同一个优先级，从左到右运算
+
+- protected可以给同一包中其他类访问，但是也可以给不在同一包的子类访问。
+
+- ReadWriteLock适用于读多写少的并发场景
+
+- CopyOnWriteArrayList适用于写少读多的并发场景
+
+- 抽象类可以有构造方法，接口不能有构造方法
+
+- 当所有必要的类都已经装载结束，开始执行main()方法体
+
+- 存在使i + 1 < i的数，如果 i 为 int 型，那么当 i 为 int 能表示的最大整数时，i+1 就溢出变成负数了
+
+- px = dp*（dpi/160）
+
+- Object 的公有方法有：equals() hashcode() toString() getClass() notify() notifyAll() wait()
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

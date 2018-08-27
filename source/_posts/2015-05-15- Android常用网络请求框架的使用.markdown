@@ -1,0 +1,21 @@
+---
+layout: post
+title: "Android常用网络请求框架的使用"
+date: 2015-05-03 15:25:33 +0800
+comments: true
+tags: Android
+---
+
+此篇待更新
+
+<!--more-->
+
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

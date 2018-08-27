@@ -1,0 +1,35 @@
+---
+layout: post
+title: "【视频教程】非对称密码的编程使用"
+date: 2015-05-21 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+相比于对称密码算法的的单钥体系，非对称密码算法的双钥体系更为安全，且不再存在密钥管理问题，往往应用在一些安全性要求相当高的领域，比如 B2C、B2B 等电子商务平台。
+
+**核心内容**
+
+* 非对称密码概述
+* DH 算法的编程使用
+* RSA 算法的编程使用
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/932.html?hmsr=teacher_icodeyou_c932)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_非对称密码的编程使用.mp4" controls="controls"></video>
+</div>
+
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

@@ -1,0 +1,41 @@
+title: Android 群英传读书笔记
+date: 2015-10-06 22:18:44
+tags: Android
+----
+
+偶然在知乎上看到了关于《Android 群英传》的介绍，感觉还不错，尤其是作者前言中写的内容和我简直心照不宣——Android 学习的瓶颈与进阶，读了快半本了，感觉非常不错，不合适初学者，但绝对适合学习到了瓶颈期，想要突破自我的 Android 开发者，比如我。
+
+<!--more-->
+
+- View 通过刷新来重绘视图，系统通过发出 `VSYNC` 信号来进行重绘，刷新间隔为`16ms`。当如游戏刷新频繁时，会频繁阻塞主线程，导致画面卡顿。此时可使用 SurfaceView 来解决这一问题。View 和 SurfaceView 区别如下3点：
+ 1、View 适用于主动刷新，SurfaceView 适用于被动刷新
+ 2、View 工作在主线程，SurfaceView 工作在子线程
+ 3、View 没有使用双缓冲机制，SurfaceView 使用了双缓冲机制
+ 如果自定义 View 需要频繁刷新，或者刷新时数据处理量比较大，那就需要考虑使用 SurfaceView 来代替 View。
+
+- onSaveInstanceState() 不是每次 Activity 离开前台时都会调用的，比如用户使用 finish() 结束 Activity，则不会调用。而且 Android 系统已经默认实现了控件的缓存状态，以此来减少开发者需要实现的缓存逻辑。
+
+- 如果启动模式为 singleTask 的 Activity 已经在后台一个任务栈中了，那么启动后，后台的这个任务栈将一起被切换到前台。
+
+- 注意，如果在一个 singleTop 或者 singleInstance 的 ActivityA 中通过 startActivityForResult() 方法来启动另一个 ActivityB，那么系统将直接返回 Activity.RESUL_CANCELED 而不会再去等待返回。这是由于系统在 Framework 层做了对这两种启动模式的限制，因为 Android 开发者认为，不同 Task 之间，默认是不能传递数据的，如果一定要传递，那就只能通过 Intent 来绑定数据。
+
+- Android 安全机制五道防线：代码混淆 proguard + 权限控制 + 数字证书 + Linux 内核层安全机制 + 虚拟机沙箱隔离
+
+- Android 中的内存组成：寄存器 + 栈 + 堆 + 静态存储区域 + 常量池
+
+- 一旦使用完 Bitmap 后，一定要及时使用 bitmap.recycle() 方法释放内存资源。Android 3.0 之后，Bitmap 被放置到了堆中，其内存由 GC 管理，就不需要进行释放了。
+
+- 进程名以 ":" 开头的进程属于当前应用的私有进程，其它应用的组件不可以和它跑在同一个进程中，而进程名不以 ":" 开头的进程属于全局进程，其它应用通过 ShareUID 方式可以和它跑在同一个进程中。
+
+
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

@@ -1,0 +1,35 @@
+---
+layout: post
+title: "【视频教程】对称密码的编程使用"
+date: 2015-05-04 15:20:33 +0800
+comments: true
+tags: [极客学院, 密码学, Java]
+---
+
+**课程背景**
+
+对称密码算法是当今应用范围最广，使用频率最高的加密算法。它不仅应用于软件行业，在硬件行业同样流行。各种基础设施凡是涉及到安全需求，都会优先考虑对称加密算法。
+
+**核心内容**
+
+* 对称密码概述
+* DES 算法的编程使用
+* 3DES 算法的编程使用
+* AES 算法的编程使用
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/833.html?hmsr=teacher_icodeyou_c833)**学习~
+
+<div class="video-container">
+	<video src="http://7xivx9.com1.z0.glb.clouddn.com/jike_对称密码的编程使用.mp4" controls="controls"></video>
+</div>
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

@@ -1,0 +1,405 @@
+title: AIDL 使用及原理探索
+date: 2015-10-28 22:18:44 
+tags: Android
+----
+
+AIDL 是 Android IPC 通信的一种方式，底层实现是 Binder。本文主要介绍 AIDL 的使用以及分析根据 .aidl 自动生成的 .java 文件。
+
+<!--more-->
+
+# AIDL 在两个进程通信中的使用
+
+我们需要有两个进程，分别称之为 Client 和 Server，最终要使用 AIDL 实现的效果是 Client 可以调用 Server 进程中的方法，即跨进程调用（RPC），执行效果如下图所示：
+
+![aidl-play](http://7xivx9.com1.z0.glb.clouddn.com/aidl-play.gif)
+
+### Server 端
+
+1、在 Server 的工程上新建一个 AIDL 文件，如 IServerInterface.aidl，添加上需要在 Client 调用的方法，代码如下：
+
+```
+// IServerInterface.aidl
+package com.icodeyou.ipcaidlserver;
+
+// Declare any non-default types here with import statements
+
+interface IServerInterface {
+    /**
+     * Demonstrates some basic types that you can use as parameters
+     * and return values in AIDL.
+     */
+    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
+            double aDouble, String aString);
+
+    // 这是手动增加的方法，作用为设置 Server 中 Service 的对象 data 值
+    void setData(String data);
+    // 这是手动增加的方法，作用为设置 Server 中 Service 的对象 isRunning 值
+    void isRunning(boolean isRunning);
+}
+```
+
+可以看到这个接口中有两个我们手动新添加的方法，也就是我们要在 Client 能够调用的方法。
+
+2、在 Server 的工程上新建一个 Service，如 ServerService，并实现其 onBind() 等回调方法，代码如下：
+
+```
+package com.icodeyou.ipcaidlserver;
+import ...
+
+public class ServerService extends Service {
+    private static final String TAG = "ServerService";
+    // Service 中维护的变量，之后在一个线程中循环打印
+    private String mData = "1";
+    // 线程运行的标志变量
+    private boolean mIsRunning = true;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // Service 创建后每隔一秒打印一次 mData
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (mIsRunning)
+                try {
+                    Thread.sleep(1000);
+                    Log.d(TAG, mData);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+    	// 很重要，在客户端调用 bindService() 后会调用到这里，返回 binder 对象给客户端
+        return new IServerInterface.Stub() {
+            @Override
+            public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, String aString) throws RemoteException {
+            }
+
+            // 根据客户端调用方法时传的参数替换本 Service 中对象的值，下同
+            @Override
+            public void setData(String data) throws RemoteException {
+                ServerService.this.mData = data;
+            }
+
+            @Override
+            public void isRunning(boolean isRunning) throws RemoteException {
+                mIsRunning = isRunning;
+            }
+        };
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+}
+```
+
+Server 端的代码就搞定了，可以直接现在模拟器上运行了，只要等待下面客户端的远程调用就可以了，下面看客户端的实现部分。
+
+### Client
+
+客户端的截图如下：
+
+![aidlclient](http://7xivx9.com1.z0.glb.clouddn.com/aidl-client.png)
+
+根据截图，说一下客户端要完成的工作：
+
+- 绑定到远程的 Service，并将远程 Service 的 onBind() 返回的 Binder 对象保存
+- 通过上一步获取到的 Binder 对象，可直接调用 binder.setData() 以及 binder.isRunning() 来设置远程 Service 的状态
+
+下面看客户端的代码：
+
+```
+package com.icodeyou.ipcaidlclient;
+
+import ...
+
+public class MainActivity extends Activity implements View.OnClickListener {
+    private static final String TAG = "MainActivity";
+    // 绑定远程 Service 的 Intent
+    private Intent serviceIntent;
+    // 保存远程 Service#onBind() 方法的返回值，即 Binder 对象
+    private IServerInterface binder = null;
+
+    // bindService() 需要用到的 ServiceConnection 对象
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            // 当远程的 onBind() 返回时，调用到这里，将远程的 IBinder 转换成本地的 Binder 对象保存
+            binder = IServerInterface.Stub.asInterface(service);
+            // 注意这里不能够使用强制类型转换，因为两个对象在两个进程中(不同的 Dalvik)，不是属于同一个类
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        serviceIntent = new Intent();
+        // 这里很关键，需要明确告诉远程调用的 Service 的具体包、类的信息，因为5.0之后 Service 不允许隐式调用了
+        serviceIntent.setComponent(new ComponentName("com.icodeyou.ipcaidlserver", "com.icodeyou.ipcaidlserver.ServerService"));
+
+        findViewById(R.id.id_btnBind).setOnClickListener(this);
+        findViewById(R.id.id_btnUnBind).setOnClickListener(this);
+        findViewById(R.id.id_btnChange).setOnClickListener(this);
+        findViewById(R.id.id_btnStop).setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.id_btnBind:
+                bindService(serviceIntent, serviceConnection, Service.BIND_AUTO_CREATE);
+                break;
+            case R.id.id_btnUnBind:
+                unbindService(serviceConnection);
+                if (binder != null) {
+                    binder = null;
+                }
+                break;
+            case R.id.id_btnChange:
+                if (binder != null) {
+                    try {
+                    	// 可以直接通过 binder 对象来进行远程方法调用，改变远程 Service 中的值
+                        binder.setData("2");
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case  R.id.id_btnStop:
+                if (binder != null) {
+                    try {
+                    	// 可以直接通过 binder 对象来进行远程方法调用，改变远程线程运行状态
+                        binder.isRunning(false);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+        }
+    }
+}
+```
+
+客户端要想使用 IServerInterface，也必须得有相关的 .aidl 文件才可以，不然让它去哪里找这个类，所以我们还需要将服务器端的 aidl 文件所在的包以及类一模一样的复制到 Client 的工程目录下，还需要 Rebuild Project，如图：
+
+![aidlcopy](http://7xivx9.com1.z0.glb.clouddn.com/aidl-copy.png)
+
+对于 AIDL 的使用，简单总结一下，客户端通过 bindService() 可以绑定到远程 Service，该远程 Service 中的 onBinder() 方法返回 IBinder 对象，此时客户端便可以通过该 IBinder 对象中相关的方法来进行远程调用。
+
+# AIDL 底层原理探索
+
+我们手动新建的 .aidl 文件到底是干嘛的，没有行不行，为什么我学了这么多年的 java 了，都不知道还有 .aidl 这么个文件类型？
+
+对于 Java 语言来说，最终能实现相应的逻辑，还得靠 .java 文件才行，那么 .aidl 文件和 .java 文件有什么关系？细心点就不难发现，我们在建立了 .aidl 文件并 Rebuild Project 后，在 build/generated/aidl 文件夹下就会有一个同名的 .java 文件，并且这是一个接口文件，如图：
+
+![aidlgen](http://7xivx9.com1.z0.glb.clouddn.com/aidl-gen.png)
+
+这个文件是根据 .aidl 文件中的内容自动生成的，所以每次我们改变了 .aidl 文件中的内容后，都需要 Rebuild 一下来重新自动生成这个文件，而且 Android Studio 也会在顶部提示我们，如图：
+
+![aidlgentips](http://7xivx9.com1.z0.glb.clouddn.com/aidl-gen-tips.png)
+
+下面来看一个这个文件中的代码，其实也不复杂，根据代码先后顺序使用注释来分析：
+
+```
+/*
+ * This file is auto-generated.  DO NOT MODIFY.
+ * Original file: /Users/huan/Repository/AndroidStudioProjects/AndroidHeros/ipcaidlserver/src/main/aidl/com/icodeyou/ipcaidlserver/IServerInterface.aidl
+ */
+package com.icodeyou.ipcaidlserver;
+// Declare any non-default types here with import statements
+
+public interface IServerInterface extends android.os.IInterface {
+    // 内部的 Stub 类，在上面 AIDL 的使用上会用到这个类 
+    public static abstract class Stub extends android.os.Binder implements com.icodeyou.ipcaidlserver.IServerInterface {
+    	// Binder 的唯一标识，一般用当前 Binder 的类名表示
+        private static final java.lang.String DESCRIPTOR = "com.icodeyou.ipcaidlserver.IServerInterface";
+
+        public Stub() {
+            this.attachInterface(this, DESCRIPTOR);
+        }
+
+        // 用于将服务器端的 Binder 对象转换成客户端所需的 AIDL 接口类型的对象
+        // 并且这种转换区分进程的，如果C和S位于同一进程，那么返回服务端的Stub对象本身，否则返回的是系统封装后的 Stub.proxy 对象
+        public static com.icodeyou.ipcaidlserver.IServerInterface asInterface(android.os.IBinder obj) {
+            if ((obj == null)) {
+                return null;
+            }
+            android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);
+            if (((iin != null) && (iin instanceof com.icodeyou.ipcaidlserver.IServerInterface))) {
+                return ((com.icodeyou.ipcaidlserver.IServerInterface) iin);
+            }
+            return new com.icodeyou.ipcaidlserver.IServerInterface.Stub.Proxy(obj);
+        }
+
+        // 返回当前 Binder 对象
+        @Override
+        public android.os.IBinder asBinder() {
+            return this;
+        }
+
+        // 运行在服务端的 Binder 线程池中，通过 code 来调用相关方法
+        @Override
+        public boolean onTransact(int code, android.os.Parcel data, android.os.Parcel reply, int flags) throws android.os.RemoteException {
+            switch (code) {
+                case INTERFACE_TRANSACTION: {
+                    reply.writeString(DESCRIPTOR);
+                    return true;
+                }
+                case TRANSACTION_basicTypes: {
+                    data.enforceInterface(DESCRIPTOR);
+                    int _arg0;
+                    _arg0 = data.readInt();
+                    long _arg1;
+                    _arg1 = data.readLong();
+                    boolean _arg2;
+                    _arg2 = (0 != data.readInt());
+                    float _arg3;
+                    _arg3 = data.readFloat();
+                    double _arg4;
+                    _arg4 = data.readDouble();
+                    java.lang.String _arg5;
+                    _arg5 = data.readString();
+                    this.basicTypes(_arg0, _arg1, _arg2, _arg3, _arg4, _arg5);
+                    reply.writeNoException();
+                    return true;
+                }
+                case TRANSACTION_setData: {
+                    data.enforceInterface(DESCRIPTOR);
+                    java.lang.String _arg0;
+                    _arg0 = data.readString();
+                    this.setData(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
+                case TRANSACTION_isRunning: {
+                    data.enforceInterface(DESCRIPTOR);
+                    boolean _arg0;
+                    _arg0 = (0 != data.readInt());
+                    this.isRunning(_arg0);
+                    reply.writeNoException();
+                    return true;
+                }
+            }
+            return super.onTransact(code, data, reply, flags);
+        }
+
+        private static class Proxy implements com.icodeyou.ipcaidlserver.IServerInterface {
+            private android.os.IBinder mRemote;
+
+            Proxy(android.os.IBinder remote) {
+                mRemote = remote;
+            }
+
+            @Override
+            public android.os.IBinder asBinder() {
+                return mRemote;
+            }
+
+            public java.lang.String getInterfaceDescriptor() {
+                return DESCRIPTOR;
+            }
+
+            /**
+             * Demonstrates some basic types that you can use as parameters
+             * and return values in AIDL.
+             */
+            @Override
+            public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, java.lang.String aString) throws android.os.RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeInt(anInt);
+                    _data.writeLong(aLong);
+                    _data.writeInt(((aBoolean) ? (1) : (0)));
+                    _data.writeFloat(aFloat);
+                    _data.writeDouble(aDouble);
+                    _data.writeString(aString);
+                    mRemote.transact(Stub.TRANSACTION_basicTypes, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
+
+            // 运行在客户端，执行到 mRemote.transact() 时当前线程挂起，服务端的 onTransact 被调用直到 RPC 结束
+            @Override
+            public void setData(java.lang.String data) throws android.os.RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeString(data);
+                    mRemote.transact(Stub.TRANSACTION_setData, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
+
+            @Override
+            public void isRunning(boolean isRunning) throws android.os.RemoteException {
+                android.os.Parcel _data = android.os.Parcel.obtain();
+                android.os.Parcel _reply = android.os.Parcel.obtain();
+                try {
+                    _data.writeInterfaceToken(DESCRIPTOR);
+                    _data.writeInt(((isRunning) ? (1) : (0)));
+                    mRemote.transact(Stub.TRANSACTION_isRunning, _data, _reply, 0);
+                    _reply.readException();
+                } finally {
+                    _reply.recycle();
+                    _data.recycle();
+                }
+            }
+        }
+
+        // 定义的 code 常量，标识对应的方法
+        static final int TRANSACTION_basicTypes = (android.os.IBinder.FIRST_CALL_TRANSACTION + 0);
+        static final int TRANSACTION_setData = (android.os.IBinder.FIRST_CALL_TRANSACTION + 1);
+        static final int TRANSACTION_isRunning = (android.os.IBinder.FIRST_CALL_TRANSACTION + 2);
+    }
+
+    public void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, java.lang.String aString) throws android.os.RemoteException;
+
+    public void setData(java.lang.String data) throws android.os.RemoteException;
+
+    public void isRunning(boolean isRunning) throws android.os.RemoteException;
+}
+```
+
+根据注释就能了解 Binder 的工作机制，但还是有两点需要注意一下：
+
+- 当客户端发起远程请求时，由于当前线程会被挂起直至服务端进程返回数据，所以如果一个远程方法是很耗时的，那么就不能在 UI 线程中发起此远程请求。（可以试着在远程方法中加个 Thread.sleep，看看效果）
+
+- 由于服务端的 Binder 方法运行在 Binder 线程池中，所以 Binder 方法不管是否耗时都应该采用同步的方式去实现，因为它已经运行在一个线程中了。
+
+以上就是对 aidl 文件的分析，那么问题来了，aidl 文件是不是必须的？答案是：`.aidl 文件并不是实现 Binder 的必需品`，`.aidl 文件的本质是系统为我们提供了一种快速实现 Binder 的工具而已`，所以说，实现 IPC 完全可以不用新建 .aidl 文件，而是自己写那个由 .aidl 文件生成的 .java 文件，当然，这比较难了。
+
+我现在还没有能力靠手工写出一个上述生成的 .java 文件，做个标记，希望随着学习的深入以后能办到。
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

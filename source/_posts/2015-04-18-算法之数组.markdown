@@ -1,0 +1,38 @@
+title: 算法之数组
+date: 2015-04-18 22:18:44
+tags: 算法
+---
+
+数组的常见算法题，记录一下，以备忘。
+
+<!--more-->
+
+1、整型数组的逆置算法
+
+2、旋转数组
+   For example, with n = 7 and k = 3, the array [1,2,3,4,5,6,7] is rotated to [5,6,7,1,2,3,4]。
+```
+	reverse(array, 0, n-k-1); // 反转前一半
+	reverse(array, n-k, n-1); // 反转后一半
+	reverse(array, 0, n-1);   // 反转整个数组	
+```
+
+3、排序数组中和为 s 的两个数字
+   头尾两个指针相加，根据和的大小前后移动。也可以只用一个指针，在该指针后面的数组用二分查找看有没有满足要求的数『 mid = (low + high) >>> 1 』。
+
+4、和为 s 的连续正整数序列
+   两个指针，一个从1开始，一个从2开始，计算 start 指针到 end 指针的 sum，根据 sum 比较并移动指针。
+
+5、删除排序数组中的重复元素
+   借助 ArrayList；使用 ArrayCopy；使用临时变量
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

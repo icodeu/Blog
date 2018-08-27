@@ -1,0 +1,328 @@
+title: Android 开发艺术探索读书笔记
+date: 2015-10-07 22:18:44
+tags: Android
+----
+
+和《Android 群英传》一样，《Android 开发艺术探索》是一本进阶的书，比群英传还要进阶一些，特来拜读。
+
+<!--more-->
+
+- 不能在 onPause 中做重量级的操作，因为必须 onPause 执行完成以后新启动的 Activity 才能 onResume。其实 onPause 和 onStop 都不能执行耗时的操作，尤其是 onPause，这也意味着，应当尽量在 onStop 中做操作，从而使得新 Activity 尽快显示出来并切换到前台。
+
+- onSaveInstanceState 的调用在 onStop 之前，和 onPause 没有既定的时序关系。当 Activity 被重新创建之后，系统会调用 onRestoreInstanceState，调用时机在 onStart 之后。并且，系统只在 Activity 异常终止的时候才会调用 onSaveInstanceState 和 onRestoreInstanceState 来存储和恢复数据，其它情况不会触发这个过程，但是按Home键或者启动新Activity仍然会单独触发onSaveInstanceState的调用。
+
+- 既然在 onCreate 和 onSaveInstanceState 中都能够恢复数据，那么二者有什么区别呢？区别在于 onSaveInstanceState 一旦被调用，其参数 Bundle savedInstanceState 一定是有值的；而 onCreate 中必须先进行判空处理。另外，官方文档建议是采用 onRestoreInstanceState 去恢复数据。
+
+- 在 XML 中指定 android:configChanges = "orientation | screenSize"(API>13)，可防止屏幕旋转时 Activity 重建，另外会调用 onConfigurationChanged 方法。
+
+- 为 Activity 指定启动模式有两种方式：静态 XML 中指定 launchMode 和 Intent 中动态指定 FLAG。区别在于，其一，动态优先级高于静态；其二，静态方式无法直接为 Activity 设定 FLAG_ACTIVITY_CLEAR_TOP 标识，动态方式无法为 Activity 设定 singleInstance 模式。
+
+- 以 singleTask 启动时，onPause -> onNewIntent -> onResume
+
+- adb shell dumpsys activity
+
+- IntentFilter 中过滤的信息有 action、category、data。只有一个 Intent 同时匹配 action+category+data 才算完全匹配。另外，一个 Activity 中可以有多个 IntentFilter，只要能匹配其中任何一组 IntentFilter 即可成功启动对应的 Activity。
+
+- action 的匹配要求 Intent 中的 action 存在且必须和过滤规则中的其中一个 action 相同。
+
+- action 要求 Intent 中必须有一个 action 且必须能够和过滤规则中的某个 action 相同，而 category 要求 Intent 可以没有 category，但是如果你一旦有 category，不管有几个，每个都要能够和过滤规则中的任何一个 category 相同。
+
+- 为了 Activity 能够接收隐式调用，就必须在 intent-filter 中指定 "android.intent.category.DEFAULT" 这个 category，原因是系统在调用 startActivity 或者 startActivityForResult 的时候会默认为 Intent 加上 "android.intent.category.DEFAULT" 这个 category。
+
+- 当通过隐式方式启动一个 Activity 的时候，可以做一下判断，看是否有 Activity 能够匹配我们的隐式 Intent，避免抛出找不到满足条件 Activity 的异常。判断方式有两种：采用 PackageManager 的 resolveActivity 方法或者 Intent 的 resolveActivity 方法，如果找不到就会返回 null。另外，PackageManager 还提供了 queryIntentActivities 方法，可以返回所有成功匹配的 Activities 信息而不是最佳匹配的。注意 MATCH_DEFAULT_ONLY 这个标志位，可以匹配那些在 intent-filter 中声明了 category.DEFAULT 的 Activity。使用这个标志位的意义在于，如果上述两个方法不返回 null，那么 startActivity 一定可以成功。
+
+- Parcelable：内存序列化        Serializable：持久化到设备或网络传输
+
+- 反序列化得到的对象只是在内容上和序列化之前的对象相同，但它们本质上还是两个对象，所以它叫做"对象序列化"。
+
+- 系统提供了许多实现了 Parcelable 接口的类，它们都是可以直接序列化的，如 Intent、Bundle、Bitmap等，同时 List 和 Map 也可以序列化，前提是它们里面的每个元素都是可序列化的。
+
+- Binder 主要用在 Service 中，包括 AIDL 和 Messenger（Messenger 的底层是 AIDL）
+
+- Bundle 实现了 Parcelable 接口，所以它可以很方便的在不同的进程间传输。当然，我们传输的数据必须能够被序列化，比如基本类型、实现了 Parcelable 接口的对象、实现了 Serialization 接口的对象以及一些 Android 支持的特殊对象。
+
+- 对于 SharedPreferences，系统对它的读/写都有一定的缓存策略，即在内存中会有一份 SharedPreferences 文件的缓存，因此在多进程模式下，系统对它的读/写就变得不可靠，当面对高并发的读/写访问，SharedPreferences 有很大几率会丢失数据，因此，不建议在进程通信中使用 SharedPreferences。
+
+- Messenger 可以在不同进程中传递 Message 对象，是一种轻量级的 IPC 方案，底层实现是 AIDL。只能传递消息，不能跨进程调用服务端的方法。同时，由于它一次只处理一个请求，串行执行，因此在服务端不用考虑线程同步的问题。
+
+- Message 中所支持的传输类型就是 Messenger 中所支持的传输类型。实际上，通过 Messenger 来传输 Message，Message 中能使用的载体只有 what，arg1，arg2，Bundle 以及 replyTo。至于另一个字段 object，其在同一个进程中是很实用的，但是在进程间通信的时候，在 Android 2.2 之前 object 字段不支持跨进程传输，即便是在 2.2 之后，也仅仅是系统提供的实现了 Parcelable 接口的对象才能通过它来传输，这就意味着我们自定义的 Parcelable 对象无法通过 object 字段来传输。所幸我们还有 Bundle，它可以支持大量的数据类型。
+
+- 当有大量的并发请求或跨进程调用服务端的方法时，要使用 AIDL 而不是 Messenger（Messenger 底层也是 AIDL）。
+
+- AIDL 支持的数据类型：基本数据类型、String 和 CharSequence、List（只支持 ArrayList，里面每个元素都必须能够被 AIDL 支持）、Map（只支持 HashMap，里面的每个元素都必须能够被 AIDL 支持，包括 key 和 value）、所有实现了 Parcelable 接口的对象、AIDL 接口本身。其中，自定义的 Parcelable 对象和 AIDL 对象必须要显示 import 进来。
+
+- AIDL 中除了基本类型，其它类型的参数必须标上方向：in、out、inout。
+
+- AIDL 接口中只支持方法，不支持声明静态常量，这一点区别于传统的接口。 AIDL 中无法使用普通接口，如果使用接口只能是 AIDL 接口。
+
+- CopyOnWriteArrayList（不是继承自 ArrayList） 和 ConcurrentHashMap 支持并发读/写。
+
+- RemoteCallbackList 是系统专门提供的用于删除跨进程 listener 的接口。虽然多次跨进程传输客户端的同一个对象会在服务端生成不同的对象，但是这些新生成的对象有一个共同点，那就是它们底层的 Binder 对象是同一个。同时 RemoveCallbackList 还有一个很有用的功能，那就是当客户端进程终止之后，它能够自动移除客户端所注册的 listener。另外，RemoteCallbackList 内部自动实现了线程同步的功能，所以我们使用它来注册和解注册时，不需要做额外的线程同步工作。
+
+- RemoteCallbackList 有一点需要注意，我们无法像操作 List 一样去操作它，因为它并不是一个 List。其中 beginBroadcast 和 finishBroadcast 必须要配对使用，哪怕仅仅是获取 RemoteCallbackList 中元素的个数。
+
+- 和 Messenger 一样，ContentProvider 的底层实现同样也是 Binder。根据 Binder 的工作原理，onCreate、query、update、insert、delete、getType 均运行在 ContentProvider 的进程中，除了 onCreate 由系统回调并运行在主线程里，其它五个方法均由外界回调并运行在 Binder 线程池中。
+
+- android:authorities 是 ContentProvider 的唯一标识，所以也必须唯一
+
+- IPC 方式的优缺点和适用场景
+
+| 名 称 | 优 点 | 缺 点 | 适 用 场 景 |
+|:-----:|:----:|:---:|:----:|
+| Bundle | 简单易用 | 只能传输 Bundle 支持的数据类型 | 四大组件间的进程通信 |
+| 文件共享 | 简单易用 | 不适合高并发场景，并且无法做到进程间的即时通信 | 无并发访问情形、交换简单的数据实时性不高的场景 |
+| AIDL | 功能强大，支持一对多并发通信，支持实时通信 | 使用稍复杂，需要处理好线程同步 | 一对多通信且有 RPC 需求 |
+| Messenger | 功能一般，支持一对多串行通信，支持实时通信 | 不能很好处理高并发情形，不支持 RPC，数据通过 Message 进行传输，因此只能传输 Bundle 支持的数据类型 | 低并发的一对多即时通信，无 RPC 需求，或者无须要返回结果的 RPC 需求 |
+| ContentProvider | 在数据源访问方面功能强大，支持一对多并发数据共享，可通过 Call 方法扩展其它操作 | 可以理解为受约束的 AIDL，主要提供数据源的 CRUD 操作 | 一对多的进程间的数据共享 |
+| Socket | 功能强大，可以通过网络传输字节流，支持一对多并发实时通信 | 实现细节稍微有点麻烦，不支持直接的 RPC | 网络数据交换 |
+
+- x、y、translationX、translationY 是 Android 3.0 后增加的额外参数，translationX 和 translationY 默认是 0.
+
+- x = left + translationX  and  y = top + translatinY。需要注意的是，View 在平移的过程中，top 和 left 表示的是原始左上角的位置信息，其值并不会发生改变，此时发生改变的是 x、y、translationX、translationY 这四个参数。
+
+- touchSlop 是系统所能识别的被认为是滑动的最小距离，如果两次滑动之间的距离小于这个常量，那么系统就不认为你是在进行滑动操作。这是一个常量，和设备有关，有的是 8dp。
+
+- View 的滑动方式有三种：
+（1）scrollTo/scrollBy，只能将 View 的内容进行移动，并不能将 View 本身进行移动，也就是说，不管怎么滑动，也不可能将当前 View 滑动到附近 View 所在的区域。
+	mScrollX = View 左边缘 - View 内容左边缘
+	mScrollY = View 上边缘 - View 内容上边缘
+（2）View 动画是对 View 的影像做操作，它并不能改变 View 的位置参数，包括宽/高，并且如果希望动画后的状态得以保留还必须将 fillAfter 设置为 true。属性动画并不会存在上述问题，Android 3.0 以下通过 nineoldandroids 来实现的属性动画本质上仍然是 View 动画。
+（3）改变布局参数实现 View 滑动
+
+- View 滑动三种方式对比
+（1）scrollTo/scrollBy：适合对 View 内容的滑动
+（2）动画：主要适用于没有交互的 View 和实现复杂的动画效果
+（3）改变布局参数：适用于有交互的 View
+
+- Scroller 的使用
+```
+    Scroller mScroller = new Scroller(mContext);
+
+    // 缓慢滚动到指定位置
+    private void smoothScrollTo(int destX, int destY) {
+        int scrollX = getScrollX();
+        int deltaX = destX - scrollX;
+        // 1000ms 横坐标从 scrollX 滑动到 scrollX + deltaX，效果就是慢慢移动
+        mScroller.startScroll(scrollX, 0, deltaX, 0, 1000);
+        invalidate(); // 触发 View 的第一次重绘
+    }
+
+    // View 的每次重绘都会调用这个方法
+    @Override
+    public void computeScroll() {
+        // true 代表动画还没结束
+        if (mScroller.computeScrollOffset()) { // 此方法会根据时间的流逝来计算当前的 scrollX 和 scrollY 的值
+            scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
+            postInvalidate();
+        }
+    }
+```
+
+
+Scroll 的滑动是指 View 内容的滑动而非 View 本身位置的改变。整个过程中它对 View 没有丝毫的引用，甚至在它内部连计时器都没有。
+
+- 当 ViewPager 和 Fragment 配合使用所组成的页面滑动效果，ViewPager 内部又有一个 ListView，本来这种情况下是有滑动冲突的，但是 ViewPager 内部处理了这种滑动冲突。但如果采用的是 ScrollView，那就必须手动处理滑动冲突了。
+
+- dispatchTouchEvent(MotionEvent ev) 处理模型:
+
+
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        boolean consume = false;
+
+        if ( onInterceptTouchEvent(ev) ) {
+            consume = onTouchEvent(ev);
+            consume = true;
+        } else {
+            consume = child.dispatchTouchEvent(ev);
+        }
+
+        return consume;
+    }
+
+
+- TimeInterpolator 为时间插值器，作用是根据时间流逝的百分比来计算出当前属性值改变的百分比，系统预置的有 LinearInterpolator、AccelerateDecelerateInterpolator、DecelerateInterpolator。
+
+- TypeEvaluator 为类型估值算法，也叫做估值器，作用是根据当前属性改变的百分比来计算改变后的属性值。
+
+- Measure：getMeasuredHeight、getMeasuredWidth  Layout：getHeight、getWidth、四个顶点的坐标
+
+- measure 是测量的意思，那么 onMeasure() 方法顾名思义就是用于测量视图的大小的。View 系统的绘制流程会从 ViewRoot 的 performTraversals() 方法中开始，在其内部调用 View 的measure() 方法。measure() 方法接收两个参数，widthMeasureSpec 和 heightMeasureSpec，这两个值分别用于确定视图的宽度和高度的规格和大小。
+
+- 对于普通 View，其 MeasureSpec 由父容器的 MeasureSpec 和自身的 LayoutParams 来共同决定。
+
+- 在 TextView、ImageView 等源码中可以发现，针对 wrap_content 情形，它们的 onMeasure 方法均做了特殊处理。
+
+- 在 onCreate、onStart、onResume 中均无法正确得到某个 View 的宽高信息，这是因为 View 的 measure 过程和 Activity 的生命周期方法不是同步执行的，因此无法保证 Activity 执行了 onCreate、onStart、onResume 时某个 View 已经测量完毕了，如果 View 还没有测量完毕，那么获得的宽高就是0。
+
+- 需要注意的是，在 onMeasure()#setMeasuredDimension()方法调用之后，我们才能使用 getMeasuredWidth() 和 getMeasuredHeight() 来获取视图测量出的宽高，以此之前调用这两个方法得到的值都会是0。
+
+- 视图大小的控制是由父视图、布局文件、以及视图本身共同完成的，父视图会提供给子视图参考的大小，而开发人员可以在XML文件中指定视图的大小，然后视图本身会对最终的大小进行拍板。
+
+- Layout 的作用是 ViewGroup 用来确定子元素的位置，当 ViewGroup 的位置被确定后，它在 onLayout 中会遍历所有的子元素并调用其 layout 方法，在 layout 方法中 onLayout 方法又会被调用。Layout 方法确定 View 本身的位置，而 onLayout 方法则会确定所有子元素的位置。
+
+- View 中的 onLayout() 方法就是一个空方法，因为 onLayout() 过程是为了确定视图在布局中所在的位置，而这个操作应该是由布局来完成的，即父视图决定子视图的显示位置。而 ViewGroup 中 的onLayout() 方法是一个抽象方法，这就意味着所有 ViewGroup 的子类都必须重写这个方法。没错，像 LinearLayout、RelativeLayout 等布局，都是重写了这个方法，然后在内部按照各自的规则对子视图进行布局的。
+
+
+- Draw 过程的作用是将 View 绘制到屏幕上，过程遵循如下几步：
+（1）绘制背景 background.draw(canvas)
+（2）绘制自己 onDraw
+（3）绘制 children dispatchDraw
+（4）绘制装饰 onDrawScrollBars
+
+- 自定义 View 需要注意的问题：
+（1）对于直接继承自 View 的控件，如果不对 wrap_content 做特殊处理，那么使用 wrap_content 就相当于 match_parent
+（2）对于直接继承自 View 和 ViewGroup 的控件，padding 默认是无法生效的，需要自己在 onDraw 中处理
+
+- 如果一个 View 不需要绘制任何内容，可以设置 setWillNotDraw(true)，系统会进行相应优化。默认情况下，View 没有启用这个标记位，而 ViewGroup 会默认启用这个标志位。对应实际开发意义是：当我们的自定义控件继承于 ViewGroup 并且本身不具备绘制功能时，就可以开启这个标记位从而便于系统进行后续的优化。当然，当明确知道一个 ViewGroup 需要通过 onDraw 来绘制内容时，我们需要显示地关闭 WILL_NOT_DRAW 这个标记位。
+
+- ThreadLocal 可以在不同的线程中互不干扰地存储并提供数据，并通过 ThreadLocal 可以轻松获取每个线程的 Looper
+
+- ThreadLocal 的效果是因为不同线程访问同一个 ThreadLocal 的 get() 方法，ThreadLocal 内部会从各自的线程中取出一个数组(ThreadLocal.Value)，然后再从数组中根据当前 ThreadLocal 的索引去查找出对应的 value 值。很显然，不容线程中的数组是不同的，这就是为什么通过 ThreadLocal 可以在不同的线程中维护一套数据的副本并且彼此互不干扰。
+
+- 非主线程不能更新 UI 是因为 ViewRootImpl 对 UI 操作进行了验证，由 checkThread() 来完成：
+
+
+    void checkThread() {
+    	if ( mThread != Thread.currentThread ) {
+    		throw new CalledFromWrongThreadException("Only the original thread that created a view hierarchy can touch its view.");
+    	}
+    }
+
+
+- 非主线程不能更新 UI 是因为 UI 控件不是线程安全的，多线程中并发访问会导致 UI 控件处于不可预期的状态
+
+- MessageQueue 内部实现是单链表，而不是队列。在其 next() 方法中有一变量 nextPollTimeoutMillis 设置没有消息时等待下一次取消息的时延（书中没讲，这是我猜的）
+
+- pollOnce 和 wake 最终都是通过 Linux 的 epoll 模型来实现的。pollOnce() 通过等待被激活，然后从消息队列中获取消息；wake() 则是激活处于等待状态的消息队列，通知它有消息到达了。这是典型的生产者-消费者模型。
+
+- 由于主线程的 Looper 比较特殊，所以 Looper 提供了一个 getMainLooper() 方法，通过它可以在任何地方获取到主线程的 Looper。
+
+- Looper 也是可以退出的，quit() 会直接退出 Looper，而 quitSafely() 只是设定一个退出标记，然后把消息队列中的已有消息处理完毕后才安全退出。Looper 退出后，通过 Handler 发送的消息会失败，这个时候 Handler 的 send() 方法会返回 false。在子线程中，如果手动为其创建了 Looper，那么在所有的事情完成以后应该调用 quit 方法来终止消息循环，否则这个子线程就会一直处于等待的状态，而如果退出 Looper 以后，这个线程就会立刻终止，因此建议不需要的时候终止 Looper。
+
+- Activity 的主线程就是 ActivityThread。ActivityThread 通过 ApplicationThread 和 AMS 进行进程间通信，AMS 以进程间通信的方式完成 ActivityThread 的请求后回调 ApplicationThread 中的 Binder 方法，然后 ApplicationThread 会向 H 发送消息，H 收到消息后会将 ApplicationThread 中的逻辑切换到 ActivityThread 中去执行，即切换到主线程中去执行，这个过程就是主线程的消息循环模型。（H 是主线程中的 Handler）
+
+- 对于 AsyncTask 来说，它的底层使用了线程池，对于 IntentService 和 HandlerThread 来说，它的底层则直接使用了线程。
+
+- AsyncTask 封装了 Thread 和 Handler，但是 AsyncTask 并不适合进行特别耗时的后台任务，对于特别耗时的任务来说，建议采用线程池。
+
+- AsyncTask 注意事项：
+（1）AsyncTask 的类必须在主线程中加载，这就意味着第一次访问 AsyncTask 必须发生在主线程，当然这个过程在 Android 4.1 及以上版本已经被系统自动完成。（static final InternalHandler sHandler 是静态成员由于静态成员会在加载类的时候进行初始化，因此这就变相要求 AsyncTask 的类必须在主线程中加载）
+（2）AsyncTask 的对象必须在主线程中创建
+（3）execute() 方法必须在 UI 线程中调用
+（4）不要再程序中直接调用 onPreExecute()、onPostExecute()、doInBackground() 和 onProgressUpdate() 方法
+（5）一个 AsyncTask 对象只能执行一次，即只能调用一次 execute 方法，否则会报运行时异常
+（6）Android 1.6 之前，串行执行；Android 3.0 之前，并行执行；3.0 之后，串行执行，但可以通过 AsyncTask 的 executeOnExecutor() 方法来并行执行任务
+
+- AsyncTask 中的 InternalHandler 用于将执行环境从线程池切换到主线程
+
+- IntentService 的优点：子线程中执行，可以自动结束，不容易被系统杀死(普通线程脱离四大组件后优先级非常低)
+
+- HandlerThread 继承自 Thread，是一种可以使用 Handler 的 Thread，内部创建了消息队列。外界需要通过 Handler 的消息方式来通知 HandlerThread 执行一个具体的任务。具体使用场景是 IntentService。由于 HandlerThread 的 run 方法是一个无限循环，因此当明确不需要再使用 HandlerThread 时，可以通过它的 quit 或 quitSafely 方法来终止线程的执行。
+
+- IntentService 第一次被启动时，onCreate 方法会被调用，其中会创建一个 HandlerThread，然后使用它的 Looper 来构造一个 Handler 对象 mServiceHandler，这样通过 mServiceHandler 发送的消息最终都会在 HandlerThread 中执行。
+
+- 另外，由于每执行一个后台任务就必须启动一次 IntentService，而 IntentService 内部则通过消息的方式向 HandlerThread 请求执行任务，Handler 中的 Looper 是顺序处理消息的，这就意味着 IntentService 也是顺序执行后台任务的，当有多个后台任务同时存在时，这些后台任务会按照外界发起的顺序排队执行。
+
+- ThreadPoolExecutor 是线程池的真正实现，下面是其一个比较常用的构造方法：
+
+```
+    public ThreadPoolExecutor ( 
+    	int corePollSize, // 核心线程，默认会一直存活即使闲置。非默认是指将 allowCoreThreadTimeOut = true，则超过 keepAliveTime 后核心线程就会被终止
+    	int maximumPoolSize, // 所能容纳的最大线程数，当活动线程数达到这个数值后，后续的新任务将会被阻塞
+    	long keepAliveTime, // 非核心线程闲置的超时时长
+    	TimeUnit unit, // 枚举常量
+    	BlockingQueue<Runnable> workQueue, // 任务队列，通过 execute 方法提交的 Runnable 对象会存储在这个参数中
+    	ThreadFactory threadFactory ) // 为线程池提供创建新线程的机会，ThreadFactory 是一个接口，只有一个方法：Thread newThread(Runnable r)
+```
+
+- ThreadPoolExecutor 执行任务时的规则：
+（1）如果线程池中的线程数量未达到核心线程数量，那么会直接启动一个核心线程来执行任务
+（2）如果线程池中的线程数量已经达到或者超过核心线程的数量，那么任务会被插入到 workQueue 中排队等待执行
+（3）如果在步骤2中无法将任务插入到任务队列中，这往往是由于任务队列已满，这个时候如果线程数量未达到线程池规定的最大值，那么会立刻启动一个非核心线程来执行任务
+（4）如果步骤3中线程数量已经达到线程池规定的最大值，那么就拒绝执行此任务，ThreadPoolExecutor 会调用 RejectedExecutionHandler 的 rejectExecution 方法来通知调用者
+
+- 四种线程池：
+（1）newFixedThreadPool 只有核心线程并且这些核心线程没有超时限制，另外任务队列也是没有大小限制的。
+（2）newCachedThreadPool 只有非核心线程，并且其最大值为 Integer.MAX_VALUE，60秒超时限制，它的 SynchronousQueue 无法插入任务
+（3）newScheduledThreadPool 核心线程数由参数指定，非核心线程数无限制，非核心闲置时立即被回收
+（4）newSingleThreadExecutor 只有一个核心线程，确保所有的任务都在同一个线程中按顺序执行，不需要处理线程同步的问题，无超时限制
+
+- inSampleSize 的取值应该总是2的指数，如果外界传递给系统的 inSampleSize 不为2的指数，那么系统会向下取整并选择一个最接近2的指数来代替，但是这个结论并非在所有的 Android 版本上都成立，因此把它当成一个开发者建议即可。
+
+- 为 Activity 开启硬件加速，android:hardwareAccelerated = "true"。
+
+- 通过 UncaughtExceptionHandler 来监视应用的 crash 信息，当程序 crash 时就会调用 uncaughtException 方法。它只能收到那些未捕获的异常，被 catch 的异常不会交给 UncaughtExceptionHandler 处理。
+
+- 单个 dex 文件所能够包含的最大方法数为 65536，这包含 Android FrameWork、以来的 jar 包以及应用本身的代码中的所有方法。
+
+- 解决方法数越界的方式：
+（1）删除无用代码和第三方库
+（2）插件化机制动态加载部分 dex， 通过将一个 dex 拆分成两个或多个 dex。但是偏重量级了，而且兼容性问题往往较多
+（3）Google 2014 年提出 multidex 解决方案，很好解决，使用很简单
+
+- 使用 multidex，Android 5.0 以前需要引入 android-support-multidex.jar，5.0 以后默认支持了 multidex。
+
+- multidex 局限性：
+（1）启动速度降低，因为要额外加载 dex 文件，甚至可能出现 ANR，尤其是其它 dex 文件较大的时候，因此要避免生成较大的 dex 文件
+（2）由于 Dalvik LinearAlloc 的 bug，这可能导致使用 multidex 的应用无法在 Android 4.0 以前的手机上运行，此种情况目前还极少遇到
+
+- 插件化三个基础性问题：资源访问、Activity 生命周期管理、ClassLoader 的管理
+（1）资源访问：插件中凡是以 R 开头的资源都不能访问了，解决方法为以反射的机制调用 AssetManager 的 addAssetPath 隐藏方法，将 apk 路径传递给它，将资源加载到 AssetManager 中；然后再通过 AssetManager 来创建一个新的 Resource 对象，通过这个对象就可以访问插件 apk 中的资源了；接着在代理 Activity 中实现 getAssets() 和 getResource() 方法
+（2）Activity 生命周期管理：使用反射，但是效率低且编写麻烦；最好使用接口回调，将 Activity 的生命周期方法都写到 IDLPlugin 接口中，在代理 Activity 中只需要在相应生命周期方法中调用插件 Activity 的生命周期方法即可
+（3）插件 ClassLoader 的管理：需要合理管理各个插件的 DexClassLoader，这样同一个插件就可以采用同一个 ClassLoader 去加载类，从而避免了多个 ClassLoader 加载同一个类时所引发的类型转换错误，可以将不同插件的 ClassLoader 存储在一个 HashMap 中，这样就可以保证不同插件中的类彼此互不干扰
+
+- 当一个进程发生 ANR 了以后，系统会在 /data/anr 目录下创建一个文件 traces.txt，通过分析这个文件就能定位出 ANR 的原因。 adb pull /data/anr/traces.txt。
+
+- float x 与“零值”比较的if语句为 if (fabs(x) < 0.00001f)
+
+- 带小数的默认为 double
+
+- 进入”Dead”状态的线程还可以恢复，不一定被回收
+
+- final类型的变量一定要初始化，因为final的变量不可更改
+
+- byte和short型在计算时会自动转换为int型计算
+
+- $Usdollars 是合法标识符
+
+- throws 关键字可以在方法上声明该方法要抛出的异常，然后在方法内部通过 throw 抛出异常对象
+
+- 在 JVM 中是使用监视器锁来实现不同线程的异步执行，在语法的表现就是synchronized
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

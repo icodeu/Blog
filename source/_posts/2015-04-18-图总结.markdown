@@ -1,0 +1,60 @@
+title: 图总结
+date: 2015-04-18 22:18:44
+tags: 数据结构与算法
+---
+
+图的遍历。
+
+<!--more-->
+
+## 结构体定义
+
+```
+typedef struct EdgeNode {
+	int adjvex;
+	struct EdgeNode *next;
+}EdgeNode;
+
+typedef struct VertexNode {
+	char data;
+	EdgeNode *firstedge;
+}VertexNode, AdjList[MAXVEX];
+
+typedef struct {
+	AdjList adjList;
+	int numVertexes, numEdges;
+}GraphAdjList;
+```
+
+## 邻接表的深度优先递归算法
+
+```
+void DFS(GraphAdjList GL, int i) {
+	visited[i] = true;
+	print(GL->adjList[i].data);
+	EdgeNode *p = GL->adjList[i].firstedge;
+
+	while (p) {
+		if ( !visited[p->adjvex] )
+			DFS(GL, p->adjVex);
+		p = p->next;
+	}
+}
+
+void DFSTraverse(GraphAdjList GL) {
+	for (i=0;i<GL->numVertexes;i++)
+		visited[i] = false;
+	for (i=0;i<GL->numVertexes;i++)
+		if (!visited[i])
+			DFS(GL, i);
+}
+```
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

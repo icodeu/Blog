@@ -1,0 +1,131 @@
+title: 二叉树算法总结
+date: 2015-04-18 22:18:44
+tags: 数据结构与算法
+---
+
+二叉树的相关算法，建立、遍历等。
+
+<!--more-->
+
+## 结构体定义
+
+```
+typedef struct BiTNode {
+	ElemType data;
+	struct BiTNode *left, *right;
+}BiTNode, *BiTree;
+```
+
+## 递归遍历（前序）
+
+```
+void PreOrderTraverse(BiTree T) {
+	if ( T == NULL)
+		return;
+	print(T->data);
+	PreOrderTraverse(T->left);
+	PreOrderTraverse(T->right);
+}
+```
+
+## 非递归遍历（前序）
+
+```
+void PreOrderTraverse(BiTree T) {
+	if (T == NULL)
+		return;
+	BiTree p = T;
+	Stack<BiTree> s;
+
+	while (p!=NULL || !s.empty()) {
+
+		while (p != NULL) {
+			print(p->data);
+			s.push(p);
+			p = p->left;
+		}
+
+		if (!s.empty()) {
+			p = s.pop();
+			p = p->right;
+		}
+
+	}	
+}
+```
+
+## 非递归遍历（中序）
+
+```
+void InOrderTraverse(BiTree T) {
+	if (T == NULL)
+		return;
+	BiTree p = T;
+	Stack<BiTree> s;
+
+	while (p!=NULL || !s.empty()) {
+
+		while (p!=NULL) {
+			s.push(p);
+			p = p->left;
+		}
+
+		if (!s.empty()) {
+			p = s.pop();
+			print(p->data);
+			p = p->right;
+		}
+
+	}
+}
+```
+
+## 非递归遍历（后序）
+
+注意，只有在栈顶出现两次才能输出。
+
+```
+void PostOrderTraverse(BiTree T) {
+	if (T == NULL)
+		return;
+	BiTree p;
+	BTNode temp;
+	Stack<BTNode> s;
+
+	while (p !=NULL || !s.empty()) {
+		BTNode btn = malloc();
+		btn->node = p;
+		btn->isFirst = true;
+		s.push(btn);
+		p = p->left;
+	}
+
+	if (!s.empty()) {
+		temp = s.pop();
+		if (temp->isFirst == true) {
+			temp->isFirst = false;
+			s.push(temp);
+			p = temp->node->right;
+		}
+		else {
+			print(temp->node->data);
+			p = NULL;
+		}
+	}
+
+}
+```
+
+
+
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

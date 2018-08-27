@@ -1,0 +1,32 @@
+title: JIT 学习笔记
+date: 2015-09-16 22:18:44
+tags: Java
+---
+
+JIT编译器是Java虚拟机（以下简称JVM）中效率最高并且最重要的组成部分之一。但是很多的程序并没有充分利用JIT的高性能优化能力，很多开发者甚至也并不清楚他们的程序有效利用JIT的程度。
+
+<!--more-->
+
+JIT编译的关键一点就是JVM会自动地监控正在被解释器执行的方法。一旦某个方法被视为频繁调用，这个方法就会被标记，进而编译成本地机器指令。这些频繁执行的方法的编译由后台的一个JVM线程来完成。在编译完成之前，JVM会执行这个方法的解释执行版本。一旦该方法编译完成，JVM会使用将方法调度表中该方法的解释的版本替换成编译后的版本。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### 个人GitHub:  [http://github.com/icodeu](http://github.com/icodeu)
+
+### CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+### 个人微信号：`qqwanghuan`  技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

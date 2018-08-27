@@ -1,0 +1,36 @@
+---
+layout: post
+title: "【视频教程】Android 项目开发实战--新闻客户端"
+date: 2015-02-28 15:20:33 +0800
+comments: true
+tags: [极客学院, Android]
+---
+
+**课程背景**
+
+移动互联网背景下，手机凭借其随时随地、移动与便携等优势发展成为重要的大众传播媒体，成为媒介融合的新平台。移动新闻客户端凭借其丰富的资讯资源、实时的信息推送被越来越多的用户认可。对于各行各业来说，为了展示企业良好形象，新闻客户端是面向用户中必不可少的一部分。
+
+**核心内容**
+
+* 在 PHP 中生成 JSON 数据，在 Android 中进行 JSON 数据解析
+* Android 中 BaseAdapter 的使用
+* Android 中 WebView 的使用
+* Android 网络编程
+
+<!--more-->
+
+在此只提供视频第一课，具体课程请至**[极客学院](http://www.jikexueyuan.com/course/559.html)**学习~
+
+<div class="video-container">
+	<video src="http://icodeyou.qiniudn.com/Android 项目开发实战--新闻客户端.mp4" controls="controls"></video>
+</div>
+
+
+
+###个人github:  [http://github.com/icodeu](http://github.com/icodeu)
+
+###CSDN博客：[http://blog.csdn.net/icodeyou](http://blog.csdn.net/icodeyou)
+
+###个人微信号：`qqwanghuan`  只为技术交流
+
+![image](http://7xivx9.com1.z0.glb.clouddn.com/wxqrcode_260.png)

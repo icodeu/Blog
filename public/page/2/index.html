@@ -117,7 +117,7 @@
 				
 				<section class="switch-part switch-part2">
 					<div class="widget tagcloud" id="js-tagcloud">
-						<a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/GBN/" style="font-size: 10px;">GBN</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 18.57px;">Java</a> <a href="/tags/Linux/" style="font-size: 12.86px;">Linux</a> <a href="/tags/Mac/" style="font-size: 12.86px;">Mac</a> <a href="/tags/Mysql/" style="font-size: 10px;">Mysql</a> <a href="/tags/Octopress/" style="font-size: 10px;">Octopress</a> <a href="/tags/Python/" style="font-size: 11.43px;">Python</a> <a href="/tags/SMTP/" style="font-size: 10px;">SMTP</a> <a href="/tags/Socket/" style="font-size: 11.43px;">Socket</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Wireshark/" style="font-size: 11.43px;">Wireshark</a> <a href="/tags/android/" style="font-size: 12.86px;">android</a> <a href="/tags/icodeyou/" style="font-size: 12.86px;">icodeyou</a> <a href="/tags/netwox/" style="font-size: 10px;">netwox</a> <a href="/tags/密码学/" style="font-size: 15.71px;">密码学</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/数据结构与算法/" style="font-size: 14.29px;">数据结构与算法</a> <a href="/tags/极客学院/" style="font-size: 17.14px;">极客学院</a> <a href="/tags/算法/" style="font-size: 10px;">算法</a> <a href="/tags/设计模式/" style="font-size: 10px;">设计模式</a> <a href="/tags/路由算法/" style="font-size: 10px;">路由算法</a> <a href="/tags/迪杰斯特拉/" style="font-size: 10px;">迪杰斯特拉</a>
+						<a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/Android/" style="font-size: 20px;">Android</a> <a href="/tags/GBN/" style="font-size: 10px;">GBN</a> <a href="/tags/Git/" style="font-size: 10px;">Git</a> <a href="/tags/Java/" style="font-size: 18.57px;">Java</a> <a href="/tags/Linux/" style="font-size: 12.86px;">Linux</a> <a href="/tags/Mac/" style="font-size: 12.86px;">Mac</a> <a href="/tags/Mysql/" style="font-size: 10px;">Mysql</a> <a href="/tags/Octopress/" style="font-size: 10px;">Octopress</a> <a href="/tags/Pycharm/" style="font-size: 10px;">Pycharm</a> <a href="/tags/Python/" style="font-size: 12.86px;">Python</a> <a href="/tags/SMTP/" style="font-size: 10px;">SMTP</a> <a href="/tags/Socket/" style="font-size: 11.43px;">Socket</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Wireshark/" style="font-size: 11.43px;">Wireshark</a> <a href="/tags/android/" style="font-size: 14.29px;">android</a> <a href="/tags/frp/" style="font-size: 10px;">frp</a> <a href="/tags/icodeyou/" style="font-size: 12.86px;">icodeyou</a> <a href="/tags/netwox/" style="font-size: 10px;">netwox</a> <a href="/tags/密码学/" style="font-size: 15.71px;">密码学</a> <a href="/tags/数据结构/" style="font-size: 10px;">数据结构</a> <a href="/tags/数据结构与算法/" style="font-size: 14.29px;">数据结构与算法</a> <a href="/tags/极客学院/" style="font-size: 17.14px;">极客学院</a> <a href="/tags/算法/" style="font-size: 10px;">算法</a> <a href="/tags/设计模式/" style="font-size: 10px;">设计模式</a> <a href="/tags/路由算法/" style="font-size: 10px;">路由算法</a> <a href="/tags/迪杰斯特拉/" style="font-size: 10px;">迪杰斯特拉</a>
 					</div>
 				</section>
 				
@@ -195,11 +195,11 @@
 </nav>
       <div class="body-wrap">
   
-    <article id="post-2015-10-11-getMainLooper" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-2015-10-28-Messenger" class="article article-type-post" itemscope itemprop="blogPost">
   
     <div class="article-meta">
-      <a href="/2015/10/11/2015-10-11-getMainLooper/" class="article-date">
-  	<time datetime="2015-10-11T14:18:44.000Z" itemprop="datePublished">2015-10-11</time>
+      <a href="/2015/10/28/2015-10-28-Messenger/" class="article-date">
+  	<time datetime="2015-10-28T14:18:44.000Z" itemprop="datePublished">2015-10-28</time>
 </a>
     </div>
   
@@ -212,7 +212,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2015/10/11/2015-10-11-getMainLooper/">说说 getMainLooper</a>
+      <a class="article-title" href="/2015/10/28/2015-10-28-Messenger/">Messenger 的使用及源码解析</a>
     </h1>
   
 
@@ -221,7 +221,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>关于 Handler、Looper、MessageQueue，我想大家都了解的差不多了，简单来说就是一个 Handler 对应一个 Looper，一个 Looper 对应一个 Message。那么再想个问题，<code>一个 Handler 可以对应多个 Looper 吗？</code> <code>一个 Looper 可以对应多个 Handler 吗？</code></p>
+        <p>Messenger 和 AIDL 都是 IPC 的方式，并且 Messenger 底层也是基于 AIDL 的，只不过为了使用更方便就封装成了 Messenger。下面依次说一下 Messenger 的基本使用方式以及对 Messenger 源码进行解析。</p>
       
     </div>
     
@@ -236,7 +236,65 @@
 
       
         <p class="article-more-link">
-          <a  href="/2015/10/11/2015-10-11-getMainLooper/#more">more >></a>
+          <a  href="/2015/10/28/2015-10-28-Messenger/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-2015-10-22-ViewMeasure" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/10/22/2015-10-22-ViewMeasure/" class="article-date">
+  	<time datetime="2015-10-22T14:18:44.000Z" itemprop="datePublished">2015-10-22</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/10/22/2015-10-22-ViewMeasure/">自定义 View 之 onMeasure</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>现阶段的目标就是：好好学习自定义 View 如何实现，只知道理论不行，必须实际攻克这个难题了，做出真正有用的自定义 View 出来。先总结一些关于自定义 View 遇到的问题，结合源码分析会更明确。</p>
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a  href="/2015/10/22/2015-10-22-ViewMeasure/#more">more >></a>
         </p>
       
       <div class="clearfix"></div>
@@ -295,6 +353,64 @@
       
         <p class="article-more-link">
           <a  href="/2015/10/11/2015-10-11-IntentService源码解析/#more">more >></a>
+        </p>
+      
+      <div class="clearfix"></div>
+    </div>
+    
+  </div>
+  
+</article>
+
+
+
+
+
+
+
+  
+    <article id="post-2015-10-11-getMainLooper" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/10/11/2015-10-11-getMainLooper/" class="article-date">
+  	<time datetime="2015-10-11T14:18:44.000Z" itemprop="datePublished">2015-10-11</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/10/11/2015-10-11-getMainLooper/">说说 getMainLooper</a>
+    </h1>
+  
+
+      </header>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>关于 Handler、Looper、MessageQueue，我想大家都了解的差不多了，简单来说就是一个 Handler 对应一个 Looper，一个 Looper 对应一个 Message。那么再想个问题，<code>一个 Handler 可以对应多个 Looper 吗？</code> <code>一个 Looper 可以对应多个 Handler 吗？</code></p>
+      
+    </div>
+    
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Android/">Android</a></li></ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a  href="/2015/10/11/2015-10-11-getMainLooper/#more">more >></a>
         </p>
       
       <div class="clearfix"></div>
@@ -659,122 +775,6 @@
 
 
   
-    <article id="post-2015-09-16-BlockingQueue" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/09/15/2015-09-16-BlockingQueue/" class="article-date">
-  	<time datetime="2015-09-15T14:18:44.000Z" itemprop="datePublished">2015-09-15</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/09/15/2015-09-16-BlockingQueue/">BlockingQueue 浅层次总结</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>AsyncTask、ThreadPool 中都会用到 BlockingQueue，这是一个接口，它实现的子类有：ArrayBlockingQueue、LinkedBlockingQueue、PriorityBlockingQueue、SynchronousQueue。本文简要分析总结下 ArrayBlockingQueue。</p>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/09/15/2015-09-16-BlockingQueue/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
-    <article id="post-2015-09-14-CopyOnWrite" class="article article-type-post" itemscope itemprop="blogPost">
-  
-    <div class="article-meta">
-      <a href="/2015/09/14/2015-09-14-CopyOnWrite/" class="article-date">
-  	<time datetime="2015-09-14T14:18:44.000Z" itemprop="datePublished">2015-09-14</time>
-</a>
-    </div>
-  
-  <div class="article-inner">
-    
-      <input type="hidden" class="isFancy" />
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2015/09/14/2015-09-14-CopyOnWrite/">CopyOnWrite 浅层次总结</a>
-    </h1>
-  
-
-      </header>
-      
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>同 ConcurrentHashMap 一样，CopyOnWrite 也是一种多线程并发中使用的容器，实现起来要比 ConcurrentHashMap 简单不少。从 JDK1.5 开始 Java 并发包里提供了两个使用 CopyOnWrite 机制实现的并发容器,它们是 CopyOnWriteArrayList 和 CopyOnWriteArraySet。CopyOnWrite 容器非常有用，可以在非常多的并发场景中使用到，下面就来浅层次总结一下。</p>
-      
-    </div>
-    
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a  href="/2015/09/14/2015-09-14-CopyOnWrite/#more">more >></a>
-        </p>
-      
-      <div class="clearfix"></div>
-    </div>
-    
-  </div>
-  
-</article>
-
-
-
-
-
-
-
-  
   
     <nav id="page-nav">
       <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
@@ -785,7 +785,7 @@
   <div class="outer">
     <div id="footer-info">
     	<div class="footer-left">
-    		&copy; 2017 icodeyou
+    		&copy; 2018 icodeyou
     	</div>
 
       <div class="footer-right">
